@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class AndroidChatRepository @Inject constructor(
     private val chatGptService: ChatGptService
-) : ChatRepository {
+): ChatRepository {
 
     override suspend fun getPromptResponse(prompt: String): Resource<PromptResponse> {
         return chatGptService.getPromptResponse(prompt)

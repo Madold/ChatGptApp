@@ -15,11 +15,6 @@
             android:theme="@style/Theme.ChatGptApp"
             tools:targetApi="31">
         <activity
-                android:name=".MainActivity2"
-                android:exported="false"
-                android:label="@string/title_activity_main2"
-                android:theme="@style/Theme.ChatGptApp"/>
-        <activity
                 android:name=".ui.view.activities.main.MainActivity"
                 android:exported="true"
                 android:label="@string/app_name"

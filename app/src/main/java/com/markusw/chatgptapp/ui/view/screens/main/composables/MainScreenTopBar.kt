@@ -21,12 +21,12 @@ fun MainScreenTopBar(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
+        BasicText(
             text = "Chat-GPT Mobile App",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(
+        BasicText(
             text = botStatusText,
         )
     }

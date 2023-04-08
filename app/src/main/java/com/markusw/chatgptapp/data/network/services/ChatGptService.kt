@@ -1,13 +1,10 @@
 package com.markusw.chatgptapp.data.network.services
 
 import com.markusw.chatgptapp.core.utils.Resource
-import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.data.network.ChatGptApi
 import com.markusw.chatgptapp.data.network.RequestBody
-import com.markusw.chatgptapp.data.network.remote.responses.Choice
 import com.markusw.chatgptapp.data.network.remote.responses.Message
 import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class ChatGptService @Inject constructor(
@@ -26,14 +23,13 @@ class ChatGptService @Inject constructor(
             val botResponse = call.execute()
 
             if (!botResponse.isSuccessful) {
-                return Resource.Error(botResponse.errorBody().toString())
+                return Resource.Error("Connection error, check your internet connection and try again")
             }
 
             Resource.Success(botResponse.body()!!)
-
         } catch (e: Exception) {
             e.printStackTrace()
-            Resource.Error("Connection error")
+            Resource.Error(e.message.toString())
         }
     }
 }

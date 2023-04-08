@@ -64,7 +64,7 @@ class MainScreenViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             chatList = it.chatList + ChatMessage(
-                                content = "Error generating response",
+                                content = response.message!!,
                                 role = MessageRole.Bot
                             ),
                             botStatusText = "Bot is online",
