@@ -35,8 +35,6 @@ fun ChatItem(
             }
             .padding(16.dp)
     ) {
-        ChatBubble(
-            content = chat.content,
-        )
+        ChatBubble(chat = chat)
     }
 }

@@ -11,7 +11,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MainScreenTopBar(
-    botStatusText: String
+    botStatusText: String,
+    isBotTyping: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -26,8 +27,20 @@ fun MainScreenTopBar(
             style = MaterialTheme.typography.titleLarge,
         )
         Spacer(modifier = Modifier.height(4.dp))
-        BasicText(
-            text = botStatusText,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BasicText(
+                text = botStatusText,
+            )
+            if (isBotTyping) {
+                ThreeDotsAnimation(
+                    dotSize = 8.dp,
+                    spaceBetweenDots = 4.dp,
+                    travelDistance = 4.dp,
+                )
+            }
+        }
     }
 }
