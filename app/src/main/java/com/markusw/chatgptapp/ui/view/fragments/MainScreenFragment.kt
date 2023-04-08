@@ -40,38 +40,40 @@ class MainScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
-        composeView.setContent {
-            val state by viewModel.uiState.collectAsStateWithLifecycle()
-            val focusManager = LocalFocusManager.current
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
+            setContent {
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                val focusManager = LocalFocusManager.current
 
-            ChatGptAppTheme(
-                dynamicColor = false,
-            ) {
-
-                val systemUiController = rememberSystemUiController()
-                val isSystemInDarkTheme = isSystemInDarkTheme()
-                val systemBarsColors = MaterialTheme.colorScheme.background
-
-                SideEffect {
-                    systemUiController.setSystemBarsColor(
-                        color = systemBarsColors,
-                        darkIcons = !isSystemInDarkTheme
-                    )
-                }
-
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                ChatGptAppTheme(
+                    dynamicColor = false,
                 ) {
-                    MainScreen(
-                        state = state,
-                        onSendButtonClick = {
-                            viewModel.onPromptSend()
-                            focusManager.clearFocus()
-                        },
-                        onPromptChanged = viewModel::onPromptChanged
-                    )
+
+                    val systemUiController = rememberSystemUiController()
+                    val isSystemInDarkTheme = isSystemInDarkTheme()
+                    val systemBarsColors = MaterialTheme.colorScheme.background
+
+                    SideEffect {
+                        systemUiController.setSystemBarsColor(
+                            color = systemBarsColors,
+                            darkIcons = !isSystemInDarkTheme
+                        )
+                    }
+
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MainScreen(
+                            state = state,
+                            onSendButtonClick = {
+                                viewModel.onPromptSend()
+                                focusManager.clearFocus()
+                            },
+                            onPromptChanged = viewModel::onPromptChanged
+                        )
+                    }
                 }
             }
         }
