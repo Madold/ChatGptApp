@@ -24,7 +24,11 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 - Singleton
 - SOLID
 
-<img src="https://user-images.githubusercontent.com/83137365/230752858-b2622837-7733-488b-81b5-27e1564edf75.gif" height="482" style="display:block;" >
+## Feautures
+Bot can remember previous messages
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/83137365/230752858-b2622837-7733-488b-81b5-27e1564edf75.gif" height="482" style="display:block;" >
+</div>
 
 ## Instalation 
 Clone the project with Android Studio and compile it, **remember to put your own API-KEY in the ChatGPTApiInterceptor file**
