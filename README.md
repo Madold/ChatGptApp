@@ -9,6 +9,7 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 - Retrofit
 - Coroutines
 - JSON
+- Dagger-Hilt
 
 ## Used architecture
 - MVVM
