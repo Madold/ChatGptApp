@@ -5,6 +5,7 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 
 <div style="display:flex;">
   <img src="https://user-images.githubusercontent.com/83137365/230752618-78667101-1a03-4d3e-a94f-842ad79787fb.gif" height="482" style="display:block;" >
+  <img src="https://user-images.githubusercontent.com/83137365/230752858-b2622837-7733-488b-81b5-27e1564edf75.gif" height="482" style="display:block;" >
 </div>
 
 ## Used technologies
