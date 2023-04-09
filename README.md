@@ -3,7 +3,7 @@
 ## Summary 
 This is a simple **ChatGPT clone** developed for the Android platform for the purpose of interacting with the public API that OpenAI provides for developers.
 
-<img src="https://user-images.githubusercontent.com/83137365/230752618-78667101-1a03-4d3e-a94f-842ad79787fb.gif" height="482" >
+<img src="https://user-images.githubusercontent.com/83137365/230752618-78667101-1a03-4d3e-a94f-842ad79787fb.gif" height="482" style="display:block;" >
 
 ## Used technologies
 - Kotlin
