@@ -15,5 +15,5 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 - MVVM
 
 ## Instalation 
-Clone the project with Android Studio and compile it, **remember to put your own API-KEY in the ChatGPT Interceptor**
+Clone the project with Android Studio and compile it, **remember to put your own API-KEY in the ChatGPTApiInterceptor file**
 
