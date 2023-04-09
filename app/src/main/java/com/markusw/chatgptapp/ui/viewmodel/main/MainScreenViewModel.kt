@@ -9,6 +9,7 @@ import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.data.model.toApiMessage
 import com.markusw.chatgptapp.domain.use_cases.GetChatResponse
 import com.markusw.chatgptapp.domain.use_cases.PlaySound
+import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     private val getChatResponse: GetChatResponse,
-    private val playSound: PlaySound
+    private val playSound: PlaySound,
+    private val validatePrompt: ValidatePrompt
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(MainScreenState())
@@ -47,7 +49,7 @@ class MainScreenViewModel @Inject constructor(
 
             val prompts = _uiState.value.chatList.map { it.toApiMessage() }
 
-            when(val response = getChatResponse(prompts)) {
+            when (val response = getChatResponse(prompts)) {
                 is Resource.Success -> {
 
                     val responseContent = response.data!!.choices[0].message.content
@@ -84,7 +86,13 @@ class MainScreenViewModel @Inject constructor(
     }
 
     fun onPromptChanged(prompt: String) {
-        _uiState.update { it.copy(prompt = prompt) }
+        val promptValidationResult = validatePrompt(prompt)
+        _uiState.update {
+            it.copy(
+                prompt = prompt,
+                isPromptValid = promptValidationResult.success
+            )
+        }
     }
 
 }

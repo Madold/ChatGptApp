@@ -43,7 +43,8 @@ fun MainScreen(
                     value = state.prompt,
                     onPromptChanged = onPromptChanged,
                     onSendButtonClick = onSendButtonClick,
-                    modifier = Modifier.fillMaxWidth(0.92f)
+                    modifier = Modifier.fillMaxWidth(0.92f),
+                    isPromptValid = state.isPromptValid
                 )
             }
         },
