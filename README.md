@@ -14,7 +14,7 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 ## Used architecture
 - MVVM
 
-## Used design patterns and principles
+## Patterns and design principles used
 - Singleton
 - SOLID
 
