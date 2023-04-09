@@ -43,7 +43,8 @@ class MainScreenViewModel @Inject constructor(
                     ),
                     prompt = "",
                     botStatusText = "Bot is typing",
-                    isBotTyping = true
+                    isBotTyping = true,
+                    isPromptValid = false,
                 )
             }
 
