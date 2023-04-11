@@ -3,10 +3,8 @@ package com.markusw.chatgptapp.data.network.services
 import com.markusw.chatgptapp.core.utils.Resource
 import com.markusw.chatgptapp.data.network.ChatGptApi
 import com.markusw.chatgptapp.data.network.RequestBody
-import com.markusw.chatgptapp.data.network.remote.responses.Choice
 import com.markusw.chatgptapp.data.network.remote.responses.Message
 import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class ChatGptService @Inject constructor(
@@ -35,7 +33,7 @@ class ChatGptService @Inject constructor(
 
             //For testing purposes, you can use the code below to simulate a response from the API.
 
-            delay(2500)
+            delay(3500)
             Resource.Success(
                 data = PromptResponse(
                     listOf(

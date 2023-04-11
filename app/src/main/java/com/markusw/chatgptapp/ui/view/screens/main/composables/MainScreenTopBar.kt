@@ -1,5 +1,7 @@
 package com.markusw.chatgptapp.ui.view.screens.main.composables
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +36,15 @@ fun MainScreenTopBar(
             BasicText(
                 text = botStatusText,
             )
-            if (isBotTyping) {
+            AnimatedVisibility(
+                visible = isBotTyping,
+                enter = slideInHorizontally() + expandHorizontally() + fadeIn(
+                    animationSpec = tween(delayMillis = 400)
+                ),
+                exit = slideOutHorizontally() + shrinkHorizontally(
+                    animationSpec = tween(delayMillis = 400)
+                ) + fadeOut()
+            ) {
                 ThreeDotsAnimation(
                     dotSize = 8.dp,
                     spaceBetweenDots = 4.dp,
