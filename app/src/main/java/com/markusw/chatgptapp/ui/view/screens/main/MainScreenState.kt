@@ -7,5 +7,6 @@ data class MainScreenState(
     val isPromptValid: Boolean = false,
     val chatList: List<ChatMessage> = listOf(),
     val isBotTyping: Boolean = false,
+    val isBotThinking: Boolean = false,
     val botStatusText: String = "Bot is online"
 )

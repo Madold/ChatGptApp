@@ -17,6 +17,7 @@ fun PromptField(
     onSendButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     isPromptValid: Boolean = true,
+    isEnabled: Boolean = true,
 ) {
 
     val sendIconTint by animateColorAsState(
@@ -45,5 +46,6 @@ fun PromptField(
             focusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             cursorColor = MaterialTheme.colorScheme.onBackground,
         ),
+        enabled = isEnabled
     )
 }

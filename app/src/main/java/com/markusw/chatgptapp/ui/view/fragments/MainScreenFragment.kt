@@ -71,7 +71,8 @@ class MainScreenFragment : Fragment() {
                                 viewModel.onPromptSend()
                                 focusManager.clearFocus()
                             },
-                            onPromptChanged = viewModel::onPromptChanged
+                            onPromptChanged = viewModel::onPromptChanged,
+                            onBotTypingFinished = viewModel::onBotTypingFinished,
                         )
                     }
                 }

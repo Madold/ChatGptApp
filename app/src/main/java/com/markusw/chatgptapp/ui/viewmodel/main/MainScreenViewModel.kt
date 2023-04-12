@@ -42,8 +42,8 @@ class MainScreenViewModel @Inject constructor(
                         role = MessageRole.User
                     ),
                     prompt = "",
-                    botStatusText = "Bot is typing",
-                    isBotTyping = true,
+                    botStatusText = "Bot is thinking",
+                    isBotThinking = true,
                     isPromptValid = false,
                 )
             }
@@ -64,8 +64,9 @@ class MainScreenViewModel @Inject constructor(
                                 content = responseContent,
                                 role = MessageRole.Bot
                             ),
-                            botStatusText = "Bot is online",
-                            isBotTyping = false
+                            botStatusText = "Bot is typing",
+                            isBotThinking = false,
+                            isBotTyping = true
                         )
                     }
                 }
@@ -78,7 +79,7 @@ class MainScreenViewModel @Inject constructor(
                                 role = MessageRole.Bot
                             ),
                             botStatusText = "Bot had a problem, try again",
-                            isBotTyping = false
+                            isBotThinking = false
                         )
                     }
                 }
@@ -92,6 +93,15 @@ class MainScreenViewModel @Inject constructor(
             it.copy(
                 prompt = prompt,
                 isPromptValid = promptValidationResult.success
+            )
+        }
+    }
+
+    fun onBotTypingFinished() {
+        _uiState.update {
+            it.copy(
+                isBotTyping = false,
+                botStatusText = "Bot is online"
             )
         }
     }

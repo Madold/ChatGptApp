@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -23,7 +23,8 @@ import com.orhanobut.logger.Logger
 fun MainScreen(
     state: MainScreenState,
     onSendButtonClick: () -> Unit,
-    onPromptChanged: (String) -> Unit
+    onPromptChanged: (String) -> Unit,
+    onBotTypingFinished: () -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
@@ -41,14 +42,16 @@ fun MainScreen(
                     onPromptChanged = onPromptChanged,
                     onSendButtonClick = onSendButtonClick,
                     modifier = Modifier.fillMaxWidth(0.92f),
-                    isPromptValid = state.isPromptValid
+                    isPromptValid = state.isPromptValid,
+                    isEnabled = !state.isBotTyping && !state.isBotThinking
                 )
             }
         },
         topBar = {
             MainScreenTopBar(
                 botStatusText = state.botStatusText,
-                isBotTyping = state.isBotTyping
+                isBotTyping = state.isBotTyping,
+                isBotThinking = state.isBotThinking
             )
         }
     ) {
@@ -58,9 +61,14 @@ fun MainScreen(
                 .fillMaxWidth(),
             state = scrollState
         ) {
-            items(state.chatList) { chat ->
-                ChatItem(chat = chat)
+            itemsIndexed(state.chatList) { index, chat ->
+                ChatItem(
+                    chat = chat,
+                    isLastMessage = index == state.chatList.size - 1,
+                    onBotTypingFinished = onBotTypingFinished
+                )
             }
+
         }
     }
 
