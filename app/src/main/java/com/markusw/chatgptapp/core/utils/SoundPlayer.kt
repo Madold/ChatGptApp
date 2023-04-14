@@ -15,6 +15,5 @@ class SoundPlayer @Inject constructor(
         val mediaPlayer = MediaPlayer.create(context, sound.source)
         mediaPlayer.start()
     }
-
 }
 

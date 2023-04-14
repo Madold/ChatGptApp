@@ -23,12 +23,10 @@ fun ChatItem(
     onBotTypingFinished: () -> Unit = {}
 ) {
 
-    val isMessageFromBot by remember {derivedStateOf { chat.role == MessageRole.Bot }  }
+    val isMessageFromBot by remember { derivedStateOf { chat.role == MessageRole.Bot }  }
 
     Row(
-        horizontalArrangement =
-        if (isMessageFromBot) Arrangement.Start
-        else Arrangement.End,
+        horizontalArrangement = if (isMessageFromBot) Arrangement.Start else Arrangement.End,
         modifier = Modifier
             .fillMaxWidth()
             .background(

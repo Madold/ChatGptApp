@@ -14,20 +14,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
 import com.markusw.chatgptapp.ui.view.screens.main.composables.PromptField
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.delay
 
 @Composable
 fun MainScreen(
     state: MainScreenState,
-    onSendButtonClick: () -> Unit,
-    onPromptChanged: (String) -> Unit,
+    onSendButtonClick: () -> Unit = {},
+    onPromptChanged: (String) -> Unit = {},
     onBotTypingFinished: () -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
+
+    //Auto scroll to the last item when new message is added
+    LaunchedEffect(key1 = state.chatList) {
+        if (state.chatList.isNotEmpty()) {
+            scrollState.animateScrollToItem(state.chatList.size)
+            Logger.d("Scrolling to last item")
+        }
+    }
+
+    //Constant scroll to the last item while bot is typing
+    LaunchedEffect(key1 = state.isBotTyping) {
+        while (state.isBotTyping) {
+            delay(50)
+            scrollState.animateScrollToItem(state.chatList.size)
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -53,30 +72,30 @@ fun MainScreen(
                 isBotTyping = state.isBotTyping,
                 isBotThinking = state.isBotThinking
             )
-        }
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxWidth(),
-            state = scrollState
-        ) {
-            itemsIndexed(state.chatList) { index, chat ->
-                ChatItem(
-                    chat = chat,
-                    isLastMessage = index == state.chatList.size - 1,
-                    onBotTypingFinished = onBotTypingFinished
-                )
+        },
+        content = {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxWidth(),
+                state = scrollState
+            ) {
+                itemsIndexed(state.chatList) { index, chat ->
+                    ChatItem(
+                        chat = chat,
+                        isLastMessage = index == state.chatList.size - 1,
+                        onBotTypingFinished = onBotTypingFinished
+                    )
+                }
             }
-
         }
-    }
+    )
+}
 
-    LaunchedEffect(key1 = state.chatList) {
-        if (state.chatList.isNotEmpty()) {
-            scrollState.animateScrollToItem(state.chatList.size)
-            Logger.d("Scrolling to last item")
-        }
+@Preview(showSystemUi = true)
+@Composable
+fun MainScreenPreview() {
+    ChatGptAppTheme {
+        MainScreen(state = MainScreenState())
     }
-
 }

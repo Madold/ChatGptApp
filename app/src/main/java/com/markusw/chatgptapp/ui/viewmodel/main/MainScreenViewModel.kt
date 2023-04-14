@@ -54,7 +54,6 @@ class MainScreenViewModel @Inject constructor(
                 is Resource.Success -> {
 
                     val responseContent = response.data!!.choices[0].message.content
-
                     Logger.d(responseContent)
                     playSound(AppSounds.MessageReceived)
 
@@ -79,7 +78,7 @@ class MainScreenViewModel @Inject constructor(
                                 role = MessageRole.Bot
                             ),
                             botStatusText = "Bot had a problem, try again",
-                            isBotThinking = false
+                            isBotThinking = false,
                         )
                     }
                 }
@@ -105,5 +104,4 @@ class MainScreenViewModel @Inject constructor(
             )
         }
     }
-
 }

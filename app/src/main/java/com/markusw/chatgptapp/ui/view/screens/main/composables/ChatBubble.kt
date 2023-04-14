@@ -30,7 +30,7 @@ fun ChatBubble(
         if (isFromBot && isLastMessage && textState.isEmpty()) {
             chat.content.forEach { char ->
                 textState += char
-                delay(50)
+                delay(25)
             }
             delay(1000)
             onBotTypingFinished()
