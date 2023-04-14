@@ -2,6 +2,7 @@
 
 package com.markusw.chatgptapp.ui.view.screens.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
@@ -52,7 +54,8 @@ fun MainScreen(
         bottomBar = {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .background(color = Color.Transparent),
                 contentAlignment = Alignment.Center
 
             ) {
@@ -78,7 +81,8 @@ fun MainScreen(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxWidth(),
-                state = scrollState
+                state = scrollState,
+                userScrollEnabled = !state.isBotTyping
             ) {
                 itemsIndexed(state.chatList) { index, chat ->
                     ChatItem(

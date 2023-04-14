@@ -79,6 +79,7 @@ class MainScreenViewModel @Inject constructor(
                             ),
                             botStatusText = "Bot had a problem, try again",
                             isBotThinking = false,
+                            isBotTyping = true
                         )
                     }
                 }
@@ -100,7 +101,6 @@ class MainScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isBotTyping = false,
-                botStatusText = "Bot is online"
             )
         }
     }
