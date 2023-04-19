@@ -20,7 +20,7 @@ import com.markusw.chatgptapp.data.model.MessageRole
 fun ChatItem(
     chat: ChatMessage,
     isLastMessage: Boolean = false,
-    onBotTypingFinished: () -> Unit = {}
+    onBotTypingFinished: () -> Unit = {},
 ) {
 
     val isMessageFromBot by remember { derivedStateOf { chat.role == MessageRole.Bot }  }
@@ -45,7 +45,7 @@ fun ChatItem(
             chat = chat,
             isLastMessage = isLastMessage,
             isFromBot = isMessageFromBot,
-            onBotTypingFinished = onBotTypingFinished
+            onBotTypingFinished = onBotTypingFinished,
         )
     }
 }

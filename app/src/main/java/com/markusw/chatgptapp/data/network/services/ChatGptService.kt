@@ -23,22 +23,23 @@ class ChatGptService @Inject constructor(
 
             Resource.Success(botResponse.body()!!)
 
-
-            //For testing purposes, you can use the code below to simulate a response from the API.
-
             /*
-            delay(3500)
+            //For testing purposes, you can use the code below to simulate a response from the API.
+            delay(2000)
+
             Resource.Success(
                 data = PromptResponse(
                     listOf(
                         Choice(
                             finishReason = "stop",
                             index = 0,
-                            message = Message(content = "Hello, I'm a bot. How are you? \n It seems like you are having a bad day. I can help you with that. Let me know if you want to talk about it.")
+                            message = Message(content = "ë")
                         )
                     )
                 )
-            )*/
+            )
+
+             */
         } catch (e: Exception) {
             e.printStackTrace()
             Resource.Error(e.message.toString())

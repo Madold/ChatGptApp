@@ -48,16 +48,16 @@ class MainScreenFragment : Fragment() {
 
                 ChatGptAppTheme(
                     dynamicColor = false,
+                    darkTheme = state.userSettings.darkModeEnabled
                 ) {
 
                     val systemUiController = rememberSystemUiController()
-                    val isSystemInDarkTheme = isSystemInDarkTheme()
                     val systemBarsColors = MaterialTheme.colorScheme.background
 
                     SideEffect {
                         systemUiController.setSystemBarsColor(
                             color = systemBarsColors,
-                            darkIcons = !isSystemInDarkTheme
+                            darkIcons = !state.userSettings.darkModeEnabled
                         )
                     }
 
@@ -73,6 +73,7 @@ class MainScreenFragment : Fragment() {
                             },
                             onPromptChanged = viewModel::onPromptChanged,
                             onBotTypingFinished = viewModel::onBotTypingFinished,
+                            onThemeChanged = viewModel::onThemeChanged,
                         )
                     }
                 }

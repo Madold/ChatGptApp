@@ -2,8 +2,11 @@ package com.markusw.chatgptapp.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
@@ -43,5 +46,17 @@ fun ChatGptAppTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content
+    )
+}
+
+object ChatGptAppRippleTheme : RippleTheme {
+
+    @Composable
+    override fun defaultColor(): Color = Color.White
+
+    @Composable
+    override fun rippleAlpha(): RippleAlpha = RippleTheme.defaultRippleAlpha(
+        Color.Black,
+        lightTheme = !isSystemInDarkTheme()
     )
 }

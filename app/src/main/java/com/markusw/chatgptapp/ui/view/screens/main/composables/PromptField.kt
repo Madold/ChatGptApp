@@ -45,7 +45,8 @@ fun PromptField(
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             cursorColor = MaterialTheme.colorScheme.onBackground,
+            containerColor = MaterialTheme.colorScheme.background
         ),
-        enabled = isEnabled
+        enabled = isEnabled,
     )
 }
