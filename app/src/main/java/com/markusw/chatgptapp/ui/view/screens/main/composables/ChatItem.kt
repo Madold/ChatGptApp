@@ -21,6 +21,7 @@ fun ChatItem(
     chat: ChatMessage,
     isLastMessage: Boolean = false,
     onBotTypingFinished: () -> Unit = {},
+    wasTypingAnimationPlayed: Boolean = false,
 ) {
 
     val isMessageFromBot by remember { derivedStateOf { chat.role == MessageRole.Bot }  }
@@ -33,12 +34,6 @@ fun ChatItem(
                 color = if (isMessageFromBot) MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.background,
             )
-            .run {
-                if (isMessageFromBot) {
-                    border(0.5.dp, MaterialTheme.colorScheme.onBackground)
-                }
-                this
-            }
             .padding(16.dp)
     ) {
         ChatBubble(
@@ -46,6 +41,7 @@ fun ChatItem(
             isLastMessage = isLastMessage,
             isFromBot = isMessageFromBot,
             onBotTypingFinished = onBotTypingFinished,
+            wasTypingAnimationPlayed = wasTypingAnimationPlayed,
         )
     }
 }

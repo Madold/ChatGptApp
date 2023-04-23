@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserSettingsDao {
     @Query("SELECT * FROM ${Constants.USER_SETTINGS_DB} WHERE id = 0")
-    fun getUserSettings(): Flow<UserSettings>
+    fun getUserSettings(): Flow<UserSettings?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveUserSettings(userSettingsEntity: UserSettingsEntity)
