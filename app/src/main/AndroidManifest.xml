@@ -19,7 +19,7 @@
                 android:name=".ui.view.activities.main.MainActivity"
                 android:exported="true"
                 android:label="@string/app_name"
-                android:theme="@style/Theme.ChatGptApp">
+                android:theme="@style/Theme.ChatGptApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
