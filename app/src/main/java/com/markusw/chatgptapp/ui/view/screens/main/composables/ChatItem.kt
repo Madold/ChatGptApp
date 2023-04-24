@@ -22,6 +22,7 @@ fun ChatItem(
     isLastMessage: Boolean = false,
     onBotTypingFinished: () -> Unit = {},
     wasTypingAnimationPlayed: Boolean = false,
+    onPromptCopied: () -> Unit = {}
 ) {
 
     val isMessageFromBot by remember { derivedStateOf { chat.role == MessageRole.Bot }  }
@@ -42,6 +43,7 @@ fun ChatItem(
             isFromBot = isMessageFromBot,
             onBotTypingFinished = onBotTypingFinished,
             wasTypingAnimationPlayed = wasTypingAnimationPlayed,
+            onPromptCopied = onPromptCopied
         )
     }
 }

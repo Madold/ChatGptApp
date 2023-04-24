@@ -43,7 +43,8 @@ fun MainScreen(
     onBotTypingFinished: () -> Unit = {},
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
-    onChatSelected: (Int, List<ChatMessage>) -> Unit = { _ , _ -> }
+    onChatSelected: (Int, List<ChatMessage>) -> Unit = { _ , _ -> },
+    onPromptCopied: () -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
@@ -128,7 +129,8 @@ fun MainScreen(
                                 chat = chat,
                                 isLastMessage = index == state.selectedChatList.size - 1,
                                 onBotTypingFinished = onBotTypingFinished,
-                                wasTypingAnimationPlayed = state.wasTypingAnimationPlayed
+                                wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
+                                onPromptCopied = onPromptCopied
                             )
                         }
                     }

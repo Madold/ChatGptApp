@@ -35,7 +35,8 @@ fun ChatBubble(
     isLastMessage: Boolean = false,
     isFromBot: Boolean = false,
     wasTypingAnimationPlayed: Boolean = false,
-    onBotTypingFinished: () -> Unit = {}
+    onBotTypingFinished: () -> Unit = {},
+    onPromptCopied: () -> Unit = {}
 ) {
 
     val selectionColors = TextSelectionColors(
@@ -80,6 +81,7 @@ fun ChatBubble(
             ) {
                 IconButton(
                     onClick = {
+                        onPromptCopied()
                         clipboardManager.setText(AnnotatedString(text = chat.content))
                         Toast.makeText(context, "Text copied successfully", Toast.LENGTH_SHORT).show()
                     },

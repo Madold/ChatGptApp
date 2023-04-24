@@ -14,7 +14,6 @@ import com.markusw.chatgptapp.domain.use_cases.PlaySound
 import com.markusw.chatgptapp.domain.use_cases.SaveUserSettings
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
-import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +53,7 @@ class MainScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val prompt = _uiState.value.prompt.trim()
             val chatHistory = _uiState.value.chatHistory
+            playSound(AppSounds.MessageSent)
 
             // if there is no chat history creates a new chat and add it to the history
             if (chatHistory.isEmpty()) {
@@ -87,14 +87,11 @@ class MainScreenViewModel @Inject constructor(
                     )
                 }
             }
-
             val prompts = _uiState.value.selectedChatList.map { it.toApiMessage() }
 
             when (val response = getChatResponse(prompts)) {
                 is Resource.Success -> {
                     val responseContent = response.data!!.choices[0].message.content
-                    playSound(AppSounds.MessageReceived)
-
                     _uiState.update {
                         it.copy(
                             selectedChatList = _uiState.value.selectedChatList + ChatMessage(
@@ -108,11 +105,11 @@ class MainScreenViewModel @Inject constructor(
                             wasTypingAnimationPlayed = false
                         )
                     }
-
                     chatHistory.set(
                         index = _uiState.value.selectedChatIndex,
                         element = _uiState.value.selectedChatList
                     )
+                    playSound(AppSounds.MessageReceived)
                 }
 
                 is Resource.Error -> {
@@ -185,4 +182,9 @@ class MainScreenViewModel @Inject constructor(
             )
         }
     }
+
+    fun onPromptCopied() {
+        playSound(AppSounds.PromptCopied)
+    }
+
 }

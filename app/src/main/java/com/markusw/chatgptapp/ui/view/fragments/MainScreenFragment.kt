@@ -75,6 +75,7 @@ class MainScreenFragment : Fragment() {
                             onThemeChanged = viewModel::onThemeChanged,
                             onNewChat = viewModel::onNewChat,
                             onChatSelected = viewModel::onChatSelected,
+                            onPromptCopied = viewModel::onPromptCopied,
                         )
                     }
                 }
