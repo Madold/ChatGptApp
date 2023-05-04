@@ -52,7 +52,6 @@ android {
         }
     }
 }
-
 dependencies {
 
     def retrofit_version = "2.9.0"
