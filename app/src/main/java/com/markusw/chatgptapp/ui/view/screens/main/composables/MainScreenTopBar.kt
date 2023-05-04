@@ -32,7 +32,7 @@ fun MainScreenTopBar(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BasicText(
-                    text = "Chat-GPT Mobile App",
+                    text = "ChatGPT Mobile App",
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(modifier = Modifier.height(4.dp))

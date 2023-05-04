@@ -14,12 +14,10 @@ import com.markusw.chatgptapp.domain.use_cases.PlaySound
 import com.markusw.chatgptapp.domain.use_cases.SaveUserSettings
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
-import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -38,6 +36,7 @@ class MainScreenViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        //Retrieves the locally saved user settings
         viewModelScope.launch(Dispatchers.IO) {
             val userSettings = getUserSettings()
             userSettings.collectLatest { settings ->
@@ -52,56 +51,78 @@ class MainScreenViewModel @Inject constructor(
 
     fun onPromptSend() {
         viewModelScope.launch(Dispatchers.IO) {
+            val prompt = _uiState.value.prompt.trim()
+            val chatHistory = _uiState.value.chatHistory
+            playSound(AppSounds.MessageSent)
 
-            val prompt = _uiState.value.prompt
-
-            _uiState.update {
-                it.copy(
-                    chatList = it.chatList + ChatMessage(
-                        content = prompt,
-                        role = MessageRole.User
-                    ),
-                    prompt = "",
-                    botStatusText = "Bot is thinking",
-                    isBotThinking = true,
-                    isPromptValid = false,
-                )
+            // if there is no chat history creates a new chat and add it to the history
+            if (chatHistory.isEmpty()) {
+                chatHistory.add(_uiState.value.selectedChatList)
+                _uiState.update {
+                    it.copy(
+                        selectedChatList = _uiState.value.selectedChatList + ChatMessage(
+                            content = prompt,
+                            role = MessageRole.User
+                        ),
+                        selectedChatIndex = 0,
+                        prompt = "",
+                        botStatusText = "Bot is thinking",
+                        isBotThinking = true,
+                        isPromptValid = false,
+                        chatHistory = chatHistory
+                    )
+                }
+            } else {
+                // if there is a chat history, add the prompt to the current chat
+                _uiState.update {
+                    it.copy(
+                        selectedChatList = _uiState.value.selectedChatList + ChatMessage(
+                            content = prompt,
+                            role = MessageRole.User
+                        ),
+                        prompt = "",
+                        botStatusText = "Bot is thinking",
+                        isBotThinking = true,
+                        isPromptValid = false,
+                    )
+                }
             }
-
-            val prompts = _uiState.value.chatList.map { it.toApiMessage() }
+            val prompts = _uiState.value.selectedChatList.map { it.toApiMessage() }
 
             when (val response = getChatResponse(prompts)) {
                 is Resource.Success -> {
-
                     val responseContent = response.data!!.choices[0].message.content
-                    val responseSplit = responseContent.split("\n")
-                    Logger.i(responseSplit.toString())
-
-                    playSound(AppSounds.MessageReceived)
-
                     _uiState.update {
                         it.copy(
-                            chatList = it.chatList + ChatMessage(
+                            selectedChatList = _uiState.value.selectedChatList + ChatMessage(
                                 content = responseContent,
                                 role = MessageRole.Bot
                             ),
                             botStatusText = "Bot is typing",
                             isBotThinking = false,
-                            isBotTyping = true
+                            isBotTyping = true,
+                            chatHistory = chatHistory,
+                            wasTypingAnimationPlayed = false
                         )
                     }
+                    chatHistory.set(
+                        index = _uiState.value.selectedChatIndex,
+                        element = _uiState.value.selectedChatList
+                    )
+                    playSound(AppSounds.MessageReceived)
                 }
 
                 is Resource.Error -> {
                     _uiState.update {
                         it.copy(
-                            chatList = it.chatList + ChatMessage(
+                            selectedChatList = _uiState.value.selectedChatList + ChatMessage(
                                 content = response.message!!,
                                 role = MessageRole.Bot
                             ),
                             botStatusText = "Bot had a problem, try again",
                             isBotThinking = false,
-                            isBotTyping = true
+                            isBotTyping = true,
+                            wasTypingAnimationPlayed = false
                         )
                     }
                 }
@@ -123,7 +144,8 @@ class MainScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isBotTyping = false,
-                botStatusText = "Bot is online"
+                botStatusText = "Bot is online",
+                wasTypingAnimationPlayed = true
             )
         }
     }
@@ -131,8 +153,38 @@ class MainScreenViewModel @Inject constructor(
     fun onThemeChanged() {
         viewModelScope.launch(Dispatchers.IO) {
             val currentSettings = _uiState.value.userSettings
-            val newSettings = currentSettings.copy(darkModeEnabled = !currentSettings.darkModeEnabled)
+            val newSettings =
+                currentSettings.copy(darkModeEnabled = !currentSettings.darkModeEnabled)
             saveUserSettings(newSettings)
         }
     }
+
+    fun onNewChat() {
+        if (_uiState.value.chatHistory.isNotEmpty()) {
+            val chatList = _uiState.value.chatHistory
+            chatList.add(mutableListOf())
+            _uiState.update {
+                it.copy(
+                    selectedChatList = it.chatHistory.last(),
+                    selectedChatIndex = it.chatHistory.lastIndex,
+                    chatHistory = chatList,
+                    prompt = "",
+                )
+            }
+        }
+    }
+
+    fun onChatSelected(index: Int, chatList: List<ChatMessage>) {
+        _uiState.update {
+            it.copy(
+                selectedChatList = chatList,
+                selectedChatIndex = index
+            )
+        }
+    }
+
+    fun onPromptCopied() {
+        playSound(AppSounds.PromptCopied)
+    }
+
 }

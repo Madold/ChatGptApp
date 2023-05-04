@@ -10,7 +10,7 @@ class AndroidSettingsRepository @Inject constructor(
     private val settingsDao: UserSettingsDao
 ) : SettingsRepository {
 
-    override fun getUserSettings(): Flow<UserSettings> {
+    override fun getUserSettings(): Flow<UserSettings?> {
         return settingsDao.getUserSettings()
     }
 

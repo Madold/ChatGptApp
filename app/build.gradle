@@ -13,8 +13,8 @@ android {
         applicationId "com.markusw.chatgptapp"
         minSdk 26
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "beta 0.10"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -59,6 +59,8 @@ dependencies {
     def logger_version = "2.2.0"
     def system_ui_controller_version = "0.30.1"
     def room_version = "2.5.0"
+    def typist_version = "1.2.1"
+    def splash_screen_version = "1.0.1"
 
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -93,6 +95,12 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     // To use Kotlin annotation processing tool (kapt)
     kapt "androidx.room:room-compiler:$room_version"
+
+    //Typist type writer effect library
+    implementation "tech.dev-scion:typist:$typist_version"
+
+    //Splash screen API
+    implementation "androidx.core:core-splashscreen:$splash_screen_version"
 
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"

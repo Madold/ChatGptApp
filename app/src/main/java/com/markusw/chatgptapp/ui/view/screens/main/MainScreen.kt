@@ -2,10 +2,7 @@
 
 package com.markusw.chatgptapp.ui.view.screens.main
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,13 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatMessage
-import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
+import com.markusw.chatgptapp.ui.view.screens.main.composables.NavigationDrawerContent
 import com.markusw.chatgptapp.ui.view.screens.main.composables.PromptField
-import com.markusw.chatgptapp.ui.view.screens.main.composables.ThemeItem
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -44,7 +41,10 @@ fun MainScreen(
     onSendButtonClick: () -> Unit = {},
     onPromptChanged: (String) -> Unit = {},
     onBotTypingFinished: () -> Unit = {},
-    onThemeChanged: () -> Unit = {}
+    onThemeChanged: () -> Unit = {},
+    onNewChat: () -> Unit = {},
+    onChatSelected: (Int, List<ChatMessage>) -> Unit = { _ , _ -> },
+    onPromptCopied: () -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
@@ -52,17 +52,19 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     //Auto scroll to the last item when new message is added
-    LaunchedEffect(key1 = state.chatList) {
-        if (state.chatList.isNotEmpty()) {
-            scrollState.animateScrollToItem(state.chatList.size)
+    LaunchedEffect(key1 = state.selectedChatList) {
+        if (state.selectedChatList.isNotEmpty()) {
+            scrollState.animateScrollToItem(state.selectedChatList.size)
         }
     }
 
     //Constant scroll to the last item while bot is typing
     LaunchedEffect(key1 = state.isBotTyping) {
-        while (state.isBotTyping) {
-            delay(50)
-            scrollState.animateScrollToItem(state.chatList.size)
+        launch(NonCancellable) {
+            while (state.isBotTyping) {
+                delay(50)
+                scrollState.animateScrollToItem(state.selectedChatList.size)
+            }
         }
     }
 
@@ -71,17 +73,12 @@ fun MainScreen(
         drawerContent = {
             ModalDrawerSheet(
                 content = {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        ThemeItem(
-                            darkModeEnabled = state.userSettings.darkModeEnabled,
-                            onClick = onThemeChanged
-                        )
-                    }
+                    NavigationDrawerContent(
+                        state = state,
+                        onThemeChanged = onThemeChanged,
+                        onNewChat = onNewChat,
+                        onChatSelected = onChatSelected
+                    )
                 },
                 drawerShape = RectangleShape,
                 drawerContainerColor = DarkBlue
@@ -127,11 +124,13 @@ fun MainScreen(
                         state = scrollState,
                         userScrollEnabled = !state.isBotTyping
                     ) {
-                        itemsIndexed(state.chatList) { index, chat ->
+                        itemsIndexed(state.selectedChatList) { index, chat ->
                             ChatItem(
                                 chat = chat,
-                                isLastMessage = index == state.chatList.size - 1,
+                                isLastMessage = index == state.selectedChatList.size - 1,
                                 onBotTypingFinished = onBotTypingFinished,
+                                wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
+                                onPromptCopied = onPromptCopied
                             )
                         }
                     }
@@ -155,16 +154,6 @@ fun MainScreenPreview() {
         MainScreen(
             state = MainScreenState(
                 prompt = "Example prompt",
-                chatList = listOf(
-                    ChatMessage(
-                        content = "Hello chat gpt",
-                        role = MessageRole.User
-                    ),
-                    ChatMessage(
-                        content = "Hello, how I can help you?",
-                        role = MessageRole.Bot
-                    ),
-                ),
                 isBotTyping = false,
                 botStatusText = "Bot is typing",
             )

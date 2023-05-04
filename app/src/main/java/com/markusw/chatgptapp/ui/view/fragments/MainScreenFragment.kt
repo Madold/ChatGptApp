@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -74,6 +73,9 @@ class MainScreenFragment : Fragment() {
                             onPromptChanged = viewModel::onPromptChanged,
                             onBotTypingFinished = viewModel::onBotTypingFinished,
                             onThemeChanged = viewModel::onThemeChanged,
+                            onNewChat = viewModel::onNewChat,
+                            onChatSelected = viewModel::onChatSelected,
+                            onPromptCopied = viewModel::onPromptCopied,
                         )
                     }
                 }
