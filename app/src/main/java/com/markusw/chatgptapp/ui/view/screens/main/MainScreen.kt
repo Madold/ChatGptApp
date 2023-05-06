@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
-import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
@@ -45,7 +44,8 @@ fun MainScreen(
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
     onChatSelected: (Int, ChatHistoryItemModel) -> Unit = { _, _ -> },
-    onPromptCopied: () -> Unit = {}
+    onPromptCopied: () -> Unit = {},
+    onDeleteAllChats: () -> Unit = {},
 ) {
 
     val scrollState = rememberLazyListState()
@@ -84,7 +84,8 @@ fun MainScreen(
                                 delay(200)
                                 drawerState.close()
                             }
-                        }
+                        },
+                        onDeleteAllChats = onDeleteAllChats
                     )
                 },
                 drawerShape = RectangleShape,
@@ -106,8 +107,7 @@ fun MainScreen(
                             onPromptChanged = onPromptChanged,
                             onSendButtonClick = onSendButtonClick,
                             modifier = Modifier.fillMaxWidth(0.92f),
-                            isPromptValid = state.isPromptValid,
-                            isEnabled = !state.isBotTyping && !state.isBotThinking
+                            isSendButtonEnabled = state.isPromptValid && !state.isBotTyping && !state.isBotThinking
                         )
                     }
                 },
@@ -116,6 +116,7 @@ fun MainScreen(
                         botStatusText = state.botStatusText,
                         isBotTyping = state.isBotTyping,
                         isBotThinking = state.isBotThinking,
+                        isNavigationIconButtonEnabled = !state.isBotTyping && !state.isBotThinking,
                         onNavigationIconClick = {
                             coroutineScope.launch {
                                 drawerState.open()

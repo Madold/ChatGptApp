@@ -16,12 +16,12 @@ fun PromptField(
     onPromptChanged: (String) -> Unit,
     onSendButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isPromptValid: Boolean = true,
     isEnabled: Boolean = true,
+    isSendButtonEnabled: Boolean = true,
 ) {
 
     val sendIconTint by animateColorAsState(
-        targetValue = if (isPromptValid) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
+        targetValue = if (isSendButtonEnabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
             alpha = 0.4f
         )
     )
@@ -31,11 +31,14 @@ fun PromptField(
         value = value,
         onValueChange = onPromptChanged,
         trailingIcon = {
-            IconButton(onClick = onSendButtonClick, enabled = isPromptValid) {
+            IconButton(
+                onClick = onSendButtonClick,
+                enabled = isSendButtonEnabled
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_send),
                     contentDescription = null,
-                    tint = sendIconTint
+                    tint = sendIconTint,
                 )
             }
         },

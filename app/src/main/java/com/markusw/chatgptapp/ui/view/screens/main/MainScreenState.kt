@@ -8,9 +8,7 @@ data class MainScreenState(
     val prompt: String = "",
     val isPromptValid: Boolean = false,
     val chatHistory: MutableList<ChatHistoryItemModel> = mutableListOf(),
-    val selectedChatHistoryItem: ChatHistoryItemModel = ChatHistoryItemModel(
-        chatList = listOf()
-    ),
+    val selectedChatHistoryItem: ChatHistoryItemModel = ChatHistoryItemModel(chatList = listOf()),
     val selectedChatIndex: Int = -1,
     val isBotTyping: Boolean = false,
     val isBotThinking: Boolean = false,

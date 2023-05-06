@@ -13,6 +13,7 @@ import com.markusw.chatgptapp.data.model.addChatMessage
 import com.markusw.chatgptapp.data.model.toApiMessage
 import com.markusw.chatgptapp.data.model.toDomainModel
 import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
+import com.markusw.chatgptapp.domain.use_cases.DeleteAllChats
 import com.markusw.chatgptapp.domain.use_cases.GetChatHistory
 import com.markusw.chatgptapp.domain.use_cases.GetChatResponse
 import com.markusw.chatgptapp.domain.use_cases.GetUserSettings
@@ -21,6 +22,7 @@ import com.markusw.chatgptapp.domain.use_cases.SaveChat
 import com.markusw.chatgptapp.domain.use_cases.SaveUserSettings
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
+import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +40,8 @@ class MainScreenViewModel @Inject constructor(
     private val getUserSettings: GetUserSettings,
     private val saveUserSettings: SaveUserSettings,
     private val getChatHistory: GetChatHistory,
-    private val saveChat: SaveChat
+    private val saveChat: SaveChat,
+    private val deleteAllChats: DeleteAllChats
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(MainScreenState())
@@ -78,10 +81,6 @@ class MainScreenViewModel @Inject constructor(
             playSound(AppSounds.MessageSent)
 
             //Nested functions
-            suspend fun addChatToHistory(historyItem: ChatHistoryItemModel) {
-                saveChat(historyItem)
-            }
-
             suspend fun handleUserMessage() {
 
                 if (_uiState.value.selectedChatIndex == -1 && _uiState.value.chatHistory.isNotEmpty()) {
@@ -105,14 +104,17 @@ class MainScreenViewModel @Inject constructor(
                 if (_uiState.value.selectedChatIndex == -1) {
                     _uiState.update {
                         it.copy(
-                            selectedChatIndex = 0
+                            selectedChatIndex = 0,
+                            selectedChatHistoryItem = it.selectedChatHistoryItem.copy(
+                                id = 1
+                            )
                         )
                     }
                 }
 
                 _uiState.update {
                     it.copy(
-                        selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
+                        selectedChatHistoryItem = it.selectedChatHistoryItem.addChatMessage(
                             ChatMessage(
                                 content = prompt,
                                 role = MessageRole.User
@@ -145,7 +147,8 @@ class MainScreenViewModel @Inject constructor(
                             )
                         }
 
-                        addChatToHistory(_uiState.value.selectedChatHistoryItem)
+                        Logger.d("selectedChatHistoryItem id: ${_uiState.value.selectedChatHistoryItem.id}")
+                        saveChat(_uiState.value.selectedChatHistoryItem)
                         playSound(AppSounds.MessageReceived)
                     }
 
@@ -239,6 +242,24 @@ class MainScreenViewModel @Inject constructor(
 
     fun onPromptCopied() {
         playSound(AppSounds.PromptCopied)
+    }
+
+    fun onDeleteAllChats() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteAllChats()
+
+            getChatHistory().collectLatestWithoutSubscribe().also {
+                _uiState.update { state ->
+                    state.copy(
+                        selectedChatHistoryItem = ChatHistoryItemModel(
+                            chatList = listOf()
+                        ),
+                        selectedChatIndex = -1,
+                        chatHistory = it.value.map { it.toDomainModel() }.toMutableList()
+                    )
+                }
+            }
+        }
     }
 
 }

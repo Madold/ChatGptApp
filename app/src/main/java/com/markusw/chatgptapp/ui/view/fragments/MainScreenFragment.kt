@@ -11,7 +11,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,7 +42,6 @@ class MainScreenFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner))
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
-                val focusManager = LocalFocusManager.current
 
                 ChatGptAppTheme(
                     dynamicColor = false,
@@ -66,16 +64,14 @@ class MainScreenFragment : Fragment() {
                     ) {
                         MainScreen(
                             state = state,
-                            onSendButtonClick = {
-                                viewModel.onPromptSend()
-                                focusManager.clearFocus()
-                            },
+                            onSendButtonClick = viewModel::onPromptSend,
                             onPromptChanged = viewModel::onPromptChanged,
                             onBotTypingFinished = viewModel::onBotTypingFinished,
                             onThemeChanged = viewModel::onThemeChanged,
                             onNewChat = viewModel::onNewChat,
                             onChatSelected = viewModel::onChatSelected,
                             onPromptCopied = viewModel::onPromptCopied,
+                            onDeleteAllChats = viewModel::onDeleteAllChats
                         )
                     }
                 }

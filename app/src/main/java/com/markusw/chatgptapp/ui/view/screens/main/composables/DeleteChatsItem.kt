@@ -1,4 +1,3 @@
-
 package com.markusw.chatgptapp.ui.view.screens.main.composables
 
 import androidx.compose.material3.Icon
@@ -9,21 +8,17 @@ import androidx.compose.ui.res.painterResource
 import com.markusw.chatgptapp.R
 
 @Composable
-fun ThemeItem(
-    darkModeEnabled: Boolean = false,
-    onClick: () -> Unit = {}
+fun DeleteChatsItem(
+    onClick: () -> Unit
 ) {
     NavigationDrawerButton(
-        label = {
-            Text(
-                text = if (darkModeEnabled) "Light Mode" else "Dark Mode",
-                color = Color.White
-            )
-        },
         onClick = onClick,
+        label = { 
+                Text(text = "Clear conversations", color = Color.White)
+        },
         icon = {
             Icon(
-                painter = painterResource(id = if (darkModeEnabled) R.drawable.ic_sun else R.drawable.ic_moon),
+                painter = painterResource(id = R.drawable.ic_trash_can),
                 contentDescription = null,
                 tint = Color.White
             )

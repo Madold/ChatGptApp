@@ -6,6 +6,7 @@ import com.markusw.chatgptapp.data.database.entities.ChatHistoryItemEntity
 import com.markusw.chatgptapp.data.network.remote.responses.Message
 import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
 import com.markusw.chatgptapp.data.network.services.ChatGptService
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

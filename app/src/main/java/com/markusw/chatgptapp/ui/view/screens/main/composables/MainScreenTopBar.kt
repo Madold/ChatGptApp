@@ -24,7 +24,8 @@ fun MainScreenTopBar(
     botStatusText: String,
     isBotTyping: Boolean = false,
     isBotThinking: Boolean = false,
-    onNavigationIconClick: () -> Unit = {}
+    onNavigationIconClick: () -> Unit = {},
+    isNavigationIconButtonEnabled: Boolean = true,
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -76,7 +77,7 @@ fun MainScreenTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onNavigationIconClick) {
+            IconButton(onClick = onNavigationIconClick, enabled = isNavigationIconButtonEnabled) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = null

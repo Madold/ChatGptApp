@@ -19,7 +19,8 @@ fun NavigationDrawerContent(
     state: MainScreenState,
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
-    onChatSelected: (Int, ChatHistoryItemModel) -> Unit
+    onChatSelected: (Int, ChatHistoryItemModel) -> Unit,
+    onDeleteAllChats: () -> Unit = {}
 ) {
     CompositionLocalProvider(LocalRippleTheme provides ChatGptAppRippleTheme) {
         Column(
@@ -37,6 +38,7 @@ fun NavigationDrawerContent(
             PreferencesSection(
                 state = state,
                 onThemeChanged = onThemeChanged,
+                onDeleteAllChats = onDeleteAllChats
             )
         }
     }
