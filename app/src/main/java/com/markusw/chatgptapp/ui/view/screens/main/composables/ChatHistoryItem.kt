@@ -7,26 +7,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.markusw.chatgptapp.R
-import com.markusw.chatgptapp.data.model.ChatMessage
+import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 
 @Composable
 fun ChatHistoryItem(
-    chat: List<ChatMessage>,
+    historyItem: ChatHistoryItemModel,
     index: Int,
-    onChatSelected: (Int, List<ChatMessage>) -> Unit,
+    onChatSelected: (Int, ChatHistoryItemModel) -> Unit,
     selected: Boolean = false
 ) {
     NavigationDrawerButton(
         label = {
             Text(
-                text = chat.firstOrNull()?.content ?: "New Chat",
+                text = historyItem.chatList.firstOrNull()?.content ?: "New Chat",
                 color = Color.White,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )
         },
         onClick = {
-            onChatSelected(index, chat)
+            onChatSelected(index, historyItem)
         },
         icon = {
             Icon(

@@ -14,7 +14,7 @@ class ChatGptService @Inject constructor(
 ) {
     suspend fun getPromptResponse(prompts: List<Message>): Resource<PromptResponse> {
         return try {
-
+            /*
             val body = RequestBody(messages = prompts)
             val call = api.getPromptResponse(body)
             val botResponse = call.execute()
@@ -23,10 +23,10 @@ class ChatGptService @Inject constructor(
                 return Resource.Error("Connection error, check your internet connection and try again.")
             }
 
-            Resource.Success(botResponse.body()!!)
+            Resource.Success(botResponse.body()!!)*/
 
 
-            /*
+
             //For testing purposes, you can use the code below to simulate a response from the API.
             delay(2000)
 
@@ -40,7 +40,7 @@ class ChatGptService @Inject constructor(
                         )
                     )
                 )
-            )*/
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             Resource.Error(e.message.toString())

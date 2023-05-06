@@ -4,13 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.markusw.chatgptapp.core.common.AppSounds
 import com.markusw.chatgptapp.core.utils.Resource
+import com.markusw.chatgptapp.core.utils.ext.collectLatestWithoutSubscribe
+import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.data.model.UserSettings
+import com.markusw.chatgptapp.data.model.addChatMessage
 import com.markusw.chatgptapp.data.model.toApiMessage
+import com.markusw.chatgptapp.data.model.toDomainModel
+import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
+import com.markusw.chatgptapp.domain.use_cases.GetChatHistory
 import com.markusw.chatgptapp.domain.use_cases.GetChatResponse
 import com.markusw.chatgptapp.domain.use_cases.GetUserSettings
 import com.markusw.chatgptapp.domain.use_cases.PlaySound
+import com.markusw.chatgptapp.domain.use_cases.SaveChat
 import com.markusw.chatgptapp.domain.use_cases.SaveUserSettings
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
@@ -29,7 +36,9 @@ class MainScreenViewModel @Inject constructor(
     private val playSound: PlaySound,
     private val validatePrompt: ValidatePrompt,
     private val getUserSettings: GetUserSettings,
-    private val saveUserSettings: SaveUserSettings
+    private val saveUserSettings: SaveUserSettings,
+    private val getChatHistory: GetChatHistory,
+    private val saveChat: SaveChat
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(MainScreenState())
@@ -47,88 +56,126 @@ class MainScreenViewModel @Inject constructor(
                 }
             }
         }
-    }
 
-    fun onPromptSend() {
+        //Retrieves the locally saved chats
         viewModelScope.launch(Dispatchers.IO) {
-            val prompt = _uiState.value.prompt.trim()
-            val chatHistory = _uiState.value.chatHistory
-            playSound(AppSounds.MessageSent)
-
-            // if there is no chat history creates a new chat and add it to the history
-            if (chatHistory.isEmpty()) {
-                chatHistory.add(_uiState.value.selectedChatList)
-                _uiState.update {
-                    it.copy(
-                        selectedChatList = _uiState.value.selectedChatList + ChatMessage(
-                            content = prompt,
-                            role = MessageRole.User
-                        ),
-                        selectedChatIndex = 0,
-                        prompt = "",
-                        botStatusText = "Bot is thinking",
-                        isBotThinking = true,
-                        isPromptValid = false,
-                        chatHistory = chatHistory
-                    )
-                }
-            } else {
-                // if there is a chat history, add the prompt to the current chat
-                _uiState.update {
-                    it.copy(
-                        selectedChatList = _uiState.value.selectedChatList + ChatMessage(
-                            content = prompt,
-                            role = MessageRole.User
-                        ),
-                        prompt = "",
-                        botStatusText = "Bot is thinking",
-                        isBotThinking = true,
-                        isPromptValid = false,
-                    )
-                }
-            }
-            val prompts = _uiState.value.selectedChatList.map { it.toApiMessage() }
-
-            when (val response = getChatResponse(prompts)) {
-                is Resource.Success -> {
-                    val responseContent = response.data!!.choices[0].message.content
-                    _uiState.update {
-                        it.copy(
-                            selectedChatList = _uiState.value.selectedChatList + ChatMessage(
-                                content = responseContent,
-                                role = MessageRole.Bot
-                            ),
-                            botStatusText = "Bot is typing",
-                            isBotThinking = false,
-                            isBotTyping = true,
-                            chatHistory = chatHistory,
-                            wasTypingAnimationPlayed = false
-                        )
-                    }
-                    chatHistory.set(
-                        index = _uiState.value.selectedChatIndex,
-                        element = _uiState.value.selectedChatList
-                    )
-                    playSound(AppSounds.MessageReceived)
-                }
-
-                is Resource.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            selectedChatList = _uiState.value.selectedChatList + ChatMessage(
-                                content = response.message!!,
-                                role = MessageRole.Bot
-                            ),
-                            botStatusText = "Bot had a problem, try again",
-                            isBotThinking = false,
-                            isBotTyping = true,
-                            wasTypingAnimationPlayed = false
+            val chatHistory = getChatHistory()
+            chatHistory.collectLatest { history ->
+                if (history.isNotEmpty()) {
+                    _uiState.update { state ->
+                        state.copy(
+                            chatHistory = history.map { it.toDomainModel() }.toMutableList(),
                         )
                     }
                 }
             }
         }
     }
+
+    fun onPromptSend() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val prompt = _uiState.value.prompt.trim()
+            playSound(AppSounds.MessageSent)
+
+            //Nested functions
+            suspend fun addChatToHistory(historyItem: ChatHistoryItemModel) {
+                saveChat(historyItem)
+            }
+
+            suspend fun handleUserMessage() {
+
+                if (_uiState.value.selectedChatIndex == -1 && _uiState.value.chatHistory.isNotEmpty()) {
+                    saveChat(
+                        ChatHistoryItemModel(
+                            chatList = mutableListOf()
+                        )
+                    )
+
+                    getChatHistory().collectLatestWithoutSubscribe().also {
+                        _uiState.update { state ->
+                            state.copy(
+                                selectedChatIndex = it.value.lastIndex,
+                                selectedChatHistoryItem = it.value.last().toDomainModel()
+                            )
+                        }
+                    }
+
+                }
+
+                if (_uiState.value.selectedChatIndex == -1) {
+                    _uiState.update {
+                        it.copy(
+                            selectedChatIndex = 0
+                        )
+                    }
+                }
+
+                _uiState.update {
+                    it.copy(
+                        selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
+                            ChatMessage(
+                                content = prompt,
+                                role = MessageRole.User
+                            )
+                        ),
+                        prompt = "",
+                        botStatusText = "Bot is thinking",
+                        isBotThinking = true,
+                        isPromptValid = false,
+                    )
+                }
+            }
+
+            suspend fun handleBotResponse(response: Resource<PromptResponse>) {
+                when (response) {
+                    is Resource.Success -> {
+                        val responseContent = response.data!!.choices[0].message.content
+                        _uiState.update {
+                            it.copy(
+                                selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
+                                    ChatMessage(
+                                        content = responseContent,
+                                        role = MessageRole.Bot
+                                    )
+                                ),
+                                botStatusText = "Bot is typing",
+                                isBotThinking = false,
+                                isBotTyping = true,
+                                wasTypingAnimationPlayed = false
+                            )
+                        }
+
+                        addChatToHistory(_uiState.value.selectedChatHistoryItem)
+                        playSound(AppSounds.MessageReceived)
+                    }
+
+                    is Resource.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
+                                    ChatMessage(
+                                        content = response.message!!,
+                                        role = MessageRole.Bot
+                                    )
+                                ),
+                                botStatusText = "Bot had a problem, try again",
+                                isBotThinking = false,
+                                isBotTyping = true,
+                                wasTypingAnimationPlayed = false
+                            )
+                        }
+                    }
+                }
+            }
+
+            //Main logic
+            handleUserMessage()
+            val prompts = _uiState.value.selectedChatHistoryItem.chatList.map { it.toApiMessage() }
+            val response = getChatResponse(prompts)
+            handleBotResponse(response)
+        }
+    }
+
 
     fun onPromptChanged(prompt: String) {
         val promptValidationResult = validatePrompt(prompt)
@@ -153,31 +200,38 @@ class MainScreenViewModel @Inject constructor(
     fun onThemeChanged() {
         viewModelScope.launch(Dispatchers.IO) {
             val currentSettings = _uiState.value.userSettings
-            val newSettings =
-                currentSettings.copy(darkModeEnabled = !currentSettings.darkModeEnabled)
+            val newSettings = currentSettings.copy(
+                darkModeEnabled = !currentSettings.darkModeEnabled
+            )
             saveUserSettings(newSettings)
         }
     }
 
     fun onNewChat() {
         if (_uiState.value.chatHistory.isNotEmpty()) {
-            val chatList = _uiState.value.chatHistory
-            chatList.add(mutableListOf())
-            _uiState.update {
-                it.copy(
-                    selectedChatList = it.chatHistory.last(),
-                    selectedChatIndex = it.chatHistory.lastIndex,
-                    chatHistory = chatList,
-                    prompt = "",
+            viewModelScope.launch(Dispatchers.IO) {
+                saveChat(
+                    ChatHistoryItemModel(
+                        chatList = listOf()
+                    )
                 )
+
+                getChatHistory().collectLatestWithoutSubscribe().also {
+                    _uiState.update { state ->
+                        state.copy(
+                            selectedChatIndex = it.value.lastIndex,
+                            selectedChatHistoryItem = it.value.last().toDomainModel()
+                        )
+                    }
+                }
             }
         }
     }
 
-    fun onChatSelected(index: Int, chatList: List<ChatMessage>) {
+    fun onChatSelected(index: Int, chatHistoryItem: ChatHistoryItemModel) {
         _uiState.update {
             it.copy(
-                selectedChatList = chatList,
+                selectedChatHistoryItem = chatHistoryItem,
                 selectedChatIndex = index
             )
         }
@@ -188,3 +242,4 @@ class MainScreenViewModel @Inject constructor(
     }
 
 }
+

@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
+import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
@@ -43,7 +44,7 @@ fun MainScreen(
     onBotTypingFinished: () -> Unit = {},
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
-    onChatSelected: (Int, List<ChatMessage>) -> Unit = { _ , _ -> },
+    onChatSelected: (Int, ChatHistoryItemModel) -> Unit = { _, _ -> },
     onPromptCopied: () -> Unit = {}
 ) {
 
@@ -52,9 +53,9 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     //Auto scroll to the last item when new message is added
-    LaunchedEffect(key1 = state.selectedChatList) {
-        if (state.selectedChatList.isNotEmpty()) {
-            scrollState.animateScrollToItem(state.selectedChatList.size)
+    LaunchedEffect(key1 = state.selectedChatHistoryItem) {
+        if (state.selectedChatHistoryItem.chatList.isNotEmpty()) {
+            scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
         }
     }
 
@@ -63,7 +64,7 @@ fun MainScreen(
         launch(NonCancellable) {
             while (state.isBotTyping) {
                 delay(50)
-                scrollState.animateScrollToItem(state.selectedChatList.size)
+                scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
             }
         }
     }
@@ -77,7 +78,13 @@ fun MainScreen(
                         state = state,
                         onThemeChanged = onThemeChanged,
                         onNewChat = onNewChat,
-                        onChatSelected = onChatSelected
+                        onChatSelected = { index, chat ->
+                            onChatSelected(index, chat)
+                            coroutineScope.launch {
+                                delay(200)
+                                drawerState.close()
+                            }
+                        }
                     )
                 },
                 drawerShape = RectangleShape,
@@ -124,10 +131,10 @@ fun MainScreen(
                         state = scrollState,
                         userScrollEnabled = !state.isBotTyping
                     ) {
-                        itemsIndexed(state.selectedChatList) { index, chat ->
+                        itemsIndexed(state.selectedChatHistoryItem.chatList) { index, chat ->
                             ChatItem(
                                 chat = chat,
-                                isLastMessage = index == state.selectedChatList.size - 1,
+                                isLastMessage = index == state.selectedChatHistoryItem.chatList.size - 1,
                                 onBotTypingFinished = onBotTypingFinished,
                                 wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
                                 onPromptCopied = onPromptCopied
