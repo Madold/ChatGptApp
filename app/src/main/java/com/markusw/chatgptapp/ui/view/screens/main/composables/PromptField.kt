@@ -51,5 +51,6 @@ fun PromptField(
             containerColor = MaterialTheme.colorScheme.background
         ),
         enabled = isEnabled,
+        maxLines = 7
     )
 }

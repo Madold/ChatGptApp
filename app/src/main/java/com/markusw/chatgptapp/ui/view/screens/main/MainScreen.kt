@@ -3,6 +3,7 @@
 package com.markusw.chatgptapp.ui.view.screens.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
+import com.markusw.chatgptapp.ui.view.screens.main.composables.BotPresentationSlide
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
 import com.markusw.chatgptapp.ui.view.screens.main.composables.NavigationDrawerContent
@@ -89,7 +94,7 @@ fun MainScreen(
                     )
                 },
                 drawerShape = RectangleShape,
-                drawerContainerColor = DarkBlue
+                drawerContainerColor = DarkBlue,
             )
         },
         content = {
@@ -125,21 +130,28 @@ fun MainScreen(
                     )
                 },
                 content = { padding ->
-                    LazyColumn(
+                    Box(
                         modifier = Modifier
                             .padding(padding)
-                            .fillMaxWidth(),
-                        state = scrollState,
-                        userScrollEnabled = !state.isBotTyping
                     ) {
-                        itemsIndexed(state.selectedChatHistoryItem.chatList) { index, chat ->
-                            ChatItem(
-                                chat = chat,
-                                isLastMessage = index == state.selectedChatHistoryItem.chatList.size - 1,
-                                onBotTypingFinished = onBotTypingFinished,
-                                wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
-                                onPromptCopied = onPromptCopied
-                            )
+                        if (state.selectedChatHistoryItem.chatList.isEmpty()) {
+                            BotPresentationSlide(modifier = Modifier.fillMaxSize())
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                state = scrollState,
+                                userScrollEnabled = !state.isBotTyping
+                            ) {
+                                itemsIndexed(state.selectedChatHistoryItem.chatList) { index, chat ->
+                                    ChatItem(
+                                        chat = chat,
+                                        isLastMessage = index == state.selectedChatHistoryItem.chatList.size - 1,
+                                        onBotTypingFinished = onBotTypingFinished,
+                                        wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
+                                        onPromptCopied = onPromptCopied
+                                    )
+                                }
+                            }
                         }
                     }
                 }

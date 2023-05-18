@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,28 +51,30 @@ class MainScreenViewModel @Inject constructor(
     init {
         //Retrieves the locally saved user settings
         viewModelScope.launch(Dispatchers.IO) {
-            val userSettings = getUserSettings()
-            userSettings.collectLatest { settings ->
-                _uiState.update {
-                    it.copy(
-                        userSettings = settings ?: UserSettings()
-                    )
+            getUserSettings()
+                .flowOn(Dispatchers.IO)
+                .collectLatest { settings ->
+                    _uiState.update {
+                        it.copy(
+                            userSettings = settings ?: UserSettings()
+                        )
+                    }
                 }
-            }
         }
 
         //Retrieves the locally saved chats
         viewModelScope.launch(Dispatchers.IO) {
-            val chatHistory = getChatHistory()
-            chatHistory.collectLatest { history ->
-                if (history.isNotEmpty()) {
-                    _uiState.update { state ->
-                        state.copy(
-                            chatHistory = history.map { it.toDomainModel() }.toMutableList(),
-                        )
+            getChatHistory()
+                .flowOn(Dispatchers.IO)
+                .collectLatest { history ->
+                    if (history.isNotEmpty()) {
+                        _uiState.update { state ->
+                            state.copy(
+                                chatHistory = history.map { it.toDomainModel() }.toMutableList(),
+                            )
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -82,7 +85,6 @@ class MainScreenViewModel @Inject constructor(
 
             //Nested functions
             suspend fun handleUserMessage() {
-
                 if (_uiState.value.selectedChatIndex == -1 && _uiState.value.chatHistory.isNotEmpty()) {
                     saveChat(
                         ChatHistoryItemModel(
@@ -90,14 +92,16 @@ class MainScreenViewModel @Inject constructor(
                         )
                     )
 
-                    getChatHistory().collectLatestWithoutSubscribe().also {
-                        _uiState.update { state ->
-                            state.copy(
-                                selectedChatIndex = it.value.lastIndex,
-                                selectedChatHistoryItem = it.value.last().toDomainModel()
-                            )
+                    getChatHistory()
+                        .collectLatestWithoutSubscribe(scope = viewModelScope)
+                        .also {
+                            _uiState.update { state ->
+                                state.copy(
+                                    selectedChatIndex = it.value.lastIndex,
+                                    selectedChatHistoryItem = it.value.last().toDomainModel()
+                                )
+                            }
                         }
-                    }
 
                 }
 
@@ -219,14 +223,16 @@ class MainScreenViewModel @Inject constructor(
                     )
                 )
 
-                getChatHistory().collectLatestWithoutSubscribe().also {
-                    _uiState.update { state ->
-                        state.copy(
-                            selectedChatIndex = it.value.lastIndex,
-                            selectedChatHistoryItem = it.value.last().toDomainModel()
-                        )
+                getChatHistory()
+                    .collectLatestWithoutSubscribe(scope = viewModelScope)
+                    .also {
+                        _uiState.update { state ->
+                            state.copy(
+                                selectedChatIndex = it.value.lastIndex,
+                                selectedChatHistoryItem = it.value.last().toDomainModel()
+                            )
+                        }
                     }
-                }
             }
         }
     }
@@ -248,17 +254,19 @@ class MainScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             deleteAllChats()
 
-            getChatHistory().collectLatestWithoutSubscribe().also {
-                _uiState.update { state ->
-                    state.copy(
-                        selectedChatHistoryItem = ChatHistoryItemModel(
-                            chatList = listOf()
-                        ),
-                        selectedChatIndex = -1,
-                        chatHistory = it.value.map { it.toDomainModel() }.toMutableList()
-                    )
+            getChatHistory()
+                .collectLatestWithoutSubscribe(scope = viewModelScope)
+                .also {
+                    _uiState.update { state ->
+                        state.copy(
+                            selectedChatHistoryItem = ChatHistoryItemModel(
+                                chatList = listOf()
+                            ),
+                            selectedChatIndex = -1,
+                            chatHistory = it.value.map { it.toDomainModel() }.toMutableList()
+                        )
+                    }
                 }
-            }
         }
     }
 

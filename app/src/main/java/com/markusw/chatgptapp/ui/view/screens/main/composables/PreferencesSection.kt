@@ -28,10 +28,6 @@ fun PreferencesSection(
             darkModeEnabled = state.userSettings.darkModeEnabled,
             onClick = onThemeChanged
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        DeleteChatsItem(
-            onClick = onDeleteAllChats
-        )
-
+        DeleteChatsItem(onClick = onDeleteAllChats)
     }
 }
