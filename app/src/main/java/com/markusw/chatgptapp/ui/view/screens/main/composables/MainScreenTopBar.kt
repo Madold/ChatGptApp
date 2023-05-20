@@ -34,7 +34,7 @@ fun MainScreenTopBar(
             ) {
                 BasicText(
                     text = "ChatGPT Mobile App",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.labelSmall,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(

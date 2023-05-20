@@ -17,16 +17,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
@@ -51,11 +47,13 @@ fun MainScreen(
     onChatSelected: (Int, ChatHistoryItemModel) -> Unit = { _, _ -> },
     onPromptCopied: () -> Unit = {},
     onDeleteAllChats: () -> Unit = {},
+    onVoiceButtonClick: () -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
 
     //Auto scroll to the last item when new message is added
     LaunchedEffect(key1 = state.selectedChatHistoryItem) {
@@ -112,7 +110,9 @@ fun MainScreen(
                             onPromptChanged = onPromptChanged,
                             onSendButtonClick = onSendButtonClick,
                             modifier = Modifier.fillMaxWidth(0.92f),
-                            isSendButtonEnabled = state.isPromptValid && !state.isBotTyping && !state.isBotThinking
+                            isSendButtonEnabled = state.isPromptValid && !state.isBotTyping && !state.isBotThinking,
+                            isSpeaking = state.isUserSpeaking,
+                            onVoiceButtonClick = onVoiceButtonClick
                         )
                     }
                 },
@@ -162,14 +162,13 @@ fun MainScreen(
 
 @Preview(
     showSystemUi = true,
-    wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE,
     device = Devices.PIXEL_4_XL
 )
 @Composable
 fun MainScreenPreview() {
     ChatGptAppTheme(
         dynamicColor = false,
-        darkTheme = false,
+        darkTheme = true,
     ) {
         MainScreen(
             state = MainScreenState(
@@ -180,3 +179,6 @@ fun MainScreenPreview() {
         )
     }
 }
+
+
+

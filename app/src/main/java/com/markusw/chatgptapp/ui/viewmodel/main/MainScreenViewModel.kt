@@ -1,5 +1,6 @@
 package com.markusw.chatgptapp.ui.viewmodel.main
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.markusw.chatgptapp.core.common.AppSounds
@@ -13,6 +14,7 @@ import com.markusw.chatgptapp.data.model.addChatMessage
 import com.markusw.chatgptapp.data.model.toApiMessage
 import com.markusw.chatgptapp.data.model.toDomainModel
 import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
+import com.markusw.chatgptapp.domain.services.VoiceRecognitionService
 import com.markusw.chatgptapp.domain.use_cases.DeleteAllChats
 import com.markusw.chatgptapp.domain.use_cases.GetChatHistory
 import com.markusw.chatgptapp.domain.use_cases.GetChatResponse
@@ -20,6 +22,8 @@ import com.markusw.chatgptapp.domain.use_cases.GetUserSettings
 import com.markusw.chatgptapp.domain.use_cases.PlaySound
 import com.markusw.chatgptapp.domain.use_cases.SaveChat
 import com.markusw.chatgptapp.domain.use_cases.SaveUserSettings
+import com.markusw.chatgptapp.domain.use_cases.StartListening
+import com.markusw.chatgptapp.domain.use_cases.StopListening
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 import com.orhanobut.logger.Logger
@@ -31,6 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Queue
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,11 +47,16 @@ class MainScreenViewModel @Inject constructor(
     private val saveUserSettings: SaveUserSettings,
     private val getChatHistory: GetChatHistory,
     private val saveChat: SaveChat,
-    private val deleteAllChats: DeleteAllChats
+    private val deleteAllChats: DeleteAllChats,
+    private val startListening: StartListening,
+    private val stopListening: StopListening,
+    private val voiceRecognitionService: VoiceRecognitionService
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(MainScreenState())
     val uiState = _uiState.asStateFlow()
+    val visiblePermissionDialogQueue = mutableStateListOf<String>()
+
 
     init {
         //Retrieves the locally saved user settings
@@ -75,6 +85,15 @@ class MainScreenViewModel @Inject constructor(
                         }
                     }
                 }
+        }
+
+        //Observing the state of the voice recognition service
+        viewModelScope.launch {
+            voiceRecognitionService.state.collectLatest { state ->
+                _uiState.update { it.copy(isUserSpeaking = state.isSpeaking) }.also {
+                    onPromptChanged(state.spokenText)
+                }
+            }
         }
     }
 
@@ -267,6 +286,25 @@ class MainScreenViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun onVoiceButtonClick() {
+        if (!_uiState.value.isUserSpeaking) {
+            startListening()
+            return
+        }
+
+        stopListening()
+    }
+
+    fun dismissDialog() {
+        visiblePermissionDialogQueue.removeFirst()
+    }
+
+    fun onPermissionResult(permission: String, isGranted: Boolean) {
+        if (!isGranted) {
+            visiblePermissionDialogQueue.add(element = permission)
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import com.markusw.chatgptapp.ui.theme.Poppins
 
 @Composable
 fun BasicText(
@@ -21,6 +22,7 @@ fun BasicText(
         color = MaterialTheme.colorScheme.onBackground,
         modifier = modifier,
         maxLines = maxLines,
-        textAlign = textAlign
+        textAlign = textAlign,
+        fontFamily = Poppins
     )
 }

@@ -14,5 +14,6 @@ data class MainScreenState(
     val isBotThinking: Boolean = false,
     val botStatusText: String = "Bot is online",
     val userSettings: UserSettings = UserSettings(),
-    val wasTypingAnimationPlayed: Boolean = true
+    val wasTypingAnimationPlayed: Boolean = true,
+    val isUserSpeaking: Boolean = false,
 )
