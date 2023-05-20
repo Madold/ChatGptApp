@@ -1,7 +1,6 @@
 package com.markusw.chatgptapp.ui.view.screens.main.composables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,9 +11,11 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.data.model.MessageRole
+import com.markusw.chatgptapp.ui.TestTags
 
 @Composable
 fun ChatItem(
@@ -36,6 +37,7 @@ fun ChatItem(
                 else MaterialTheme.colorScheme.background,
             )
             .padding(16.dp)
+            .testTag(TestTags.CHAT_ITEM)
     ) {
         ChatBubble(
             chat = chat,

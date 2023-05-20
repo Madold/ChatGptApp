@@ -18,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.R
 import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.data.model.MessageRole
+import com.markusw.chatgptapp.ui.TestTags.COPY_BOT_MESSAGE_BUTTON
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import tech.devscion.typist.Typist
 import tech.devscion.typist.TypistSpeed
@@ -85,7 +87,9 @@ fun ChatBubble(
                         clipboardManager.setText(AnnotatedString(text = chat.content))
                         Toast.makeText(context, "Text copied successfully", Toast.LENGTH_SHORT).show()
                     },
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .testTag(COPY_BOT_MESSAGE_BUTTON)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_clipboard),

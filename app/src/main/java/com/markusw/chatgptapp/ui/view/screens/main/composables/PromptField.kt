@@ -29,7 +29,7 @@ fun PromptField(
     val sendIconTint by animateColorAsState(
         targetValue = if (isSendButtonEnabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
             alpha = 0.4f
-        ), label = ""
+        )
     )
 
     Row(
