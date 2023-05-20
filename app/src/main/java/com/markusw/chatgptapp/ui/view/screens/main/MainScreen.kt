@@ -3,6 +3,7 @@
 package com.markusw.chatgptapp.ui.view.screens.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,11 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
-import com.markusw.chatgptapp.data.model.ChatMessage
+import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
+import com.markusw.chatgptapp.ui.view.screens.main.composables.BotPresentationSlide
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
 import com.markusw.chatgptapp.ui.view.screens.main.composables.NavigationDrawerContent
@@ -43,18 +44,21 @@ fun MainScreen(
     onBotTypingFinished: () -> Unit = {},
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
-    onChatSelected: (Int, List<ChatMessage>) -> Unit = { _ , _ -> },
-    onPromptCopied: () -> Unit = {}
+    onChatSelected: (Int, ChatHistoryItemModel) -> Unit = { _, _ -> },
+    onPromptCopied: () -> Unit = {},
+    onDeleteAllChats: () -> Unit = {},
+    onVoiceButtonClick: () -> Unit = {}
 ) {
 
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
+
     //Auto scroll to the last item when new message is added
-    LaunchedEffect(key1 = state.selectedChatList) {
-        if (state.selectedChatList.isNotEmpty()) {
-            scrollState.animateScrollToItem(state.selectedChatList.size)
+    LaunchedEffect(key1 = state.selectedChatHistoryItem) {
+        if (state.selectedChatHistoryItem.chatList.isNotEmpty()) {
+            scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
         }
     }
 
@@ -63,7 +67,7 @@ fun MainScreen(
         launch(NonCancellable) {
             while (state.isBotTyping) {
                 delay(50)
-                scrollState.animateScrollToItem(state.selectedChatList.size)
+                scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
             }
         }
     }
@@ -77,11 +81,18 @@ fun MainScreen(
                         state = state,
                         onThemeChanged = onThemeChanged,
                         onNewChat = onNewChat,
-                        onChatSelected = onChatSelected
+                        onChatSelected = { index, chat ->
+                            onChatSelected(index, chat)
+                            coroutineScope.launch {
+                                delay(200)
+                                drawerState.close()
+                            }
+                        },
+                        onDeleteAllChats = onDeleteAllChats
                     )
                 },
                 drawerShape = RectangleShape,
-                drawerContainerColor = DarkBlue
+                drawerContainerColor = DarkBlue,
             )
         },
         content = {
@@ -99,8 +110,9 @@ fun MainScreen(
                             onPromptChanged = onPromptChanged,
                             onSendButtonClick = onSendButtonClick,
                             modifier = Modifier.fillMaxWidth(0.92f),
-                            isPromptValid = state.isPromptValid,
-                            isEnabled = !state.isBotTyping && !state.isBotThinking
+                            isSendButtonEnabled = state.isPromptValid && !state.isBotTyping && !state.isBotThinking,
+                            isSpeaking = state.isUserSpeaking,
+                            onVoiceButtonClick = onVoiceButtonClick
                         )
                     }
                 },
@@ -109,6 +121,7 @@ fun MainScreen(
                         botStatusText = state.botStatusText,
                         isBotTyping = state.isBotTyping,
                         isBotThinking = state.isBotThinking,
+                        isNavigationIconButtonEnabled = !state.isBotTyping && !state.isBotThinking,
                         onNavigationIconClick = {
                             coroutineScope.launch {
                                 drawerState.open()
@@ -117,21 +130,28 @@ fun MainScreen(
                     )
                 },
                 content = { padding ->
-                    LazyColumn(
+                    Box(
                         modifier = Modifier
                             .padding(padding)
-                            .fillMaxWidth(),
-                        state = scrollState,
-                        userScrollEnabled = !state.isBotTyping
                     ) {
-                        itemsIndexed(state.selectedChatList) { index, chat ->
-                            ChatItem(
-                                chat = chat,
-                                isLastMessage = index == state.selectedChatList.size - 1,
-                                onBotTypingFinished = onBotTypingFinished,
-                                wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
-                                onPromptCopied = onPromptCopied
-                            )
+                        if (state.selectedChatHistoryItem.chatList.isEmpty()) {
+                            BotPresentationSlide(modifier = Modifier.fillMaxSize())
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                state = scrollState,
+                                userScrollEnabled = !state.isBotTyping
+                            ) {
+                                itemsIndexed(state.selectedChatHistoryItem.chatList) { index, chat ->
+                                    ChatItem(
+                                        chat = chat,
+                                        isLastMessage = index == state.selectedChatHistoryItem.chatList.size - 1,
+                                        onBotTypingFinished = onBotTypingFinished,
+                                        wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
+                                        onPromptCopied = onPromptCopied
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -142,14 +162,13 @@ fun MainScreen(
 
 @Preview(
     showSystemUi = true,
-    wallpaper = Wallpapers.GREEN_DOMINATED_EXAMPLE,
     device = Devices.PIXEL_4_XL
 )
 @Composable
 fun MainScreenPreview() {
     ChatGptAppTheme(
         dynamicColor = false,
-        darkTheme = false,
+        darkTheme = true,
     ) {
         MainScreen(
             state = MainScreenState(
@@ -160,3 +179,6 @@ fun MainScreenPreview() {
         )
     }
 }
+
+
+

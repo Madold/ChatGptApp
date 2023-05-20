@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.ui.theme.ChatGptAppRippleTheme
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
@@ -18,7 +19,8 @@ fun NavigationDrawerContent(
     state: MainScreenState,
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
-    onChatSelected: (Int, List<ChatMessage>) -> Unit
+    onChatSelected: (Int, ChatHistoryItemModel) -> Unit,
+    onDeleteAllChats: () -> Unit = {}
 ) {
     CompositionLocalProvider(LocalRippleTheme provides ChatGptAppRippleTheme) {
         Column(
@@ -36,6 +38,7 @@ fun NavigationDrawerContent(
             PreferencesSection(
                 state = state,
                 onThemeChanged = onThemeChanged,
+                onDeleteAllChats = onDeleteAllChats
             )
         }
     }

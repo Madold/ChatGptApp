@@ -3,10 +3,8 @@ package com.markusw.chatgptapp.data.network.services
 import com.markusw.chatgptapp.core.utils.Resource
 import com.markusw.chatgptapp.data.network.ChatGptApi
 import com.markusw.chatgptapp.data.network.RequestBody
-import com.markusw.chatgptapp.data.network.remote.responses.Choice
 import com.markusw.chatgptapp.data.network.remote.responses.Message
 import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class ChatGptService @Inject constructor(
@@ -24,6 +22,7 @@ class ChatGptService @Inject constructor(
             }
 
             Resource.Success(botResponse.body()!!)
+
 
 
             /*

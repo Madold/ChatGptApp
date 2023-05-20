@@ -24,7 +24,8 @@ fun MainScreenTopBar(
     botStatusText: String,
     isBotTyping: Boolean = false,
     isBotThinking: Boolean = false,
-    onNavigationIconClick: () -> Unit = {}
+    onNavigationIconClick: () -> Unit = {},
+    isNavigationIconButtonEnabled: Boolean = true,
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -33,7 +34,7 @@ fun MainScreenTopBar(
             ) {
                 BasicText(
                     text = "ChatGPT Mobile App",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.labelSmall,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
@@ -76,7 +77,7 @@ fun MainScreenTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onNavigationIconClick) {
+            IconButton(onClick = onNavigationIconClick, enabled = isNavigationIconButtonEnabled) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = null

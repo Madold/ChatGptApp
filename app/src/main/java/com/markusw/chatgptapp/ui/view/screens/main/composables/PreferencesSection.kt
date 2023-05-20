@@ -14,7 +14,8 @@ import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 fun PreferencesSection(
     state: MainScreenState,
     modifier: Modifier = Modifier,
-    onThemeChanged: () -> Unit = {}
+    onThemeChanged: () -> Unit = {},
+    onDeleteAllChats: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -27,5 +28,6 @@ fun PreferencesSection(
             darkModeEnabled = state.userSettings.darkModeEnabled,
             onClick = onThemeChanged
         )
+        DeleteChatsItem(onClick = onDeleteAllChats)
     }
 }

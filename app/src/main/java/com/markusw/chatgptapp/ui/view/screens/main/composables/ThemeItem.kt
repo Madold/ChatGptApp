@@ -1,15 +1,12 @@
 
 package com.markusw.chatgptapp.ui.view.screens.main.composables
 
-import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.markusw.chatgptapp.R
-import com.markusw.chatgptapp.ui.theme.ChatGptAppRippleTheme
 
 @Composable
 fun ThemeItem(
