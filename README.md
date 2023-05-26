@@ -4,7 +4,7 @@
 This is a simple **ChatGPT clone** developed for the Android platform for the purpose of interacting with the public API that OpenAI provides for developers.
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/83137365/230752618-78667101-1a03-4d3e-a94f-842ad79787fb.gif" height="482" style="display:block;">
+  <img src="https://github.com/Madold/ChatGptApp/assets/83137365/58cd8209-c595-4aee-ace2-6a46be2bcbc3" height="482" style="display:block;">
 </div>
 
 
