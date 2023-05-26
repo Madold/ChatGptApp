@@ -27,7 +27,7 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 ## Feautures
 Bot can remember previous messages.
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/83137365/230752858-b2622837-7733-488b-81b5-27e1564edf75.gif" height="482" style="display:block;" >
+  <img src="https://github.com/Madold/ChatGptApp/assets/83137365/5343469b-8333-4fd0-9c5c-8424f873e328" height="482" style="display:block;" >
 </div>
 
 ## Instalation 
