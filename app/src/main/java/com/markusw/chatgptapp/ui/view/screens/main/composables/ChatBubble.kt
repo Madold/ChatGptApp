@@ -28,16 +28,12 @@ import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.ui.TestTags.COPY_BOT_MESSAGE_BUTTON
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
-import tech.devscion.typist.Typist
-import tech.devscion.typist.TypistSpeed
+import com.markusw.chatgptapp.ui.theme.spacing
 
 @Composable
 fun ChatBubble(
     chat: ChatMessage,
-    isLastMessage: Boolean = false,
     isFromBot: Boolean = false,
-    wasTypingAnimationPlayed: Boolean = false,
-    onBotTypingFinished: () -> Unit = {},
     onPromptCopied: () -> Unit = {}
 ) {
 
@@ -50,33 +46,18 @@ fun ChatBubble(
 
     Column {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
         ) {
             if (isFromBot) {
                 BotAvatar()
             }
             CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
                 SelectionContainer {
-                    if (isFromBot && isLastMessage && !wasTypingAnimationPlayed) {
-                        Typist(
-                            text = chat.content,
-                            onAnimationEnd = onBotTypingFinished,
-                            cursorColor = MaterialTheme.colorScheme.onBackground,
-                            isBlinkingCursor = true,
-                            isInfiniteCursor = false,
-                            typistSpeed = TypistSpeed.EXTRA_FAST,
-                            isCursorVisible = false,
-                            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        )
-                    } else {
-                        BasicText(text = chat.content)
-                    }
+                    BasicText(text = chat.content)
                 }
             }
         }
-        if(isFromBot) {
+        if (isFromBot) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -85,7 +66,8 @@ fun ChatBubble(
                     onClick = {
                         onPromptCopied()
                         clipboardManager.setText(AnnotatedString(text = chat.content))
-                        Toast.makeText(context, "Text copied successfully", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Text copied successfully", Toast.LENGTH_SHORT)
+                            .show()
                     },
                     modifier = Modifier
                         .size(24.dp)
@@ -114,8 +96,7 @@ fun ChatBubblePreview() {
         ) {
             ChatBubble(
                 chat = ChatMessage(content = "Hi, I'm an AI bot", role = MessageRole.Bot),
-                isFromBot = true,
-                isLastMessage = false
+                isFromBot = true
             )
         }
     }

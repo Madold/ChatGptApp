@@ -13,7 +13,7 @@ import com.markusw.chatgptapp.data.model.UserSettings
 import com.markusw.chatgptapp.data.model.addChatMessage
 import com.markusw.chatgptapp.data.model.toApiMessage
 import com.markusw.chatgptapp.data.model.toDomainModel
-import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
+import com.markusw.chatgptapp.domain.ServerEvent
 import com.markusw.chatgptapp.domain.services.VoiceRecognitionService
 import com.markusw.chatgptapp.domain.use_cases.DeleteAllChats
 import com.markusw.chatgptapp.domain.use_cases.GetChatHistory
@@ -26,13 +26,14 @@ import com.markusw.chatgptapp.domain.use_cases.StartListening
 import com.markusw.chatgptapp.domain.use_cases.StopListening
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
-import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -61,8 +62,11 @@ class MainScreenViewModel @Inject constructor(
         //Retrieves the locally saved user settings
         viewModelScope.launch(Dispatchers.IO) {
             getUserSettings()
-                .flowOn(Dispatchers.IO)
-                .collectLatest { settings ->
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(5000L),
+                    UserSettings()
+                ).collectLatest { settings ->
                     _uiState.update {
                         it.copy(
                             userSettings = settings ?: UserSettings()
@@ -74,7 +78,11 @@ class MainScreenViewModel @Inject constructor(
         //Retrieves the locally saved chats
         viewModelScope.launch(Dispatchers.IO) {
             getChatHistory()
-                .flowOn(Dispatchers.IO)
+                .stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(5000L),
+                    listOf()
+                )
                 .collectLatest { history ->
                     if (history.isNotEmpty()) {
                         _uiState.update { state ->
@@ -106,7 +114,7 @@ class MainScreenViewModel @Inject constructor(
                 if (_uiState.value.selectedChatIndex == -1 && _uiState.value.chatHistory.isNotEmpty()) {
                     saveChat(
                         ChatHistoryItemModel(
-                            chatList = mutableListOf()
+                            chatList = listOf()
                         )
                     )
 
@@ -144,34 +152,77 @@ class MainScreenViewModel @Inject constructor(
                         ),
                         prompt = "",
                         botStatusText = "Bot is thinking",
-                        isBotThinking = true,
                         isPromptValid = false,
                     )
                 }
             }
 
-            suspend fun handleBotResponse(response: Resource<PromptResponse>) {
+            fun appendEmptyBotMessageToCurrentMessageList() {
+                _uiState.update {
+                    it.copy(
+                        selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
+                            ChatMessage(
+                                content = "",
+                                role = MessageRole.Bot
+                            )
+                        ),
+                        botStatusText = "Bot is typing",
+                        isBotTyping = true,
+                        wasTypingAnimationPlayed = false
+                    )
+                }
+            }
+
+            fun addChunkToCurrentMessageList(chunk: ServerEvent.BotResponse) {
+                var selectedChatList =
+                    _uiState.value.selectedChatHistoryItem.chatList
+                var lastChatMessage =
+                    _uiState.value.selectedChatHistoryItem.chatList.last()
+                val lastMessageContent = lastChatMessage.content
+                lastChatMessage = lastChatMessage.copy(
+                    content = lastMessageContent.plus(chunk.response.choices[0].delta.content)
+                )
+
+                selectedChatList = selectedChatList.dropLast(1)
+
+                _uiState.update {
+                    it.copy(
+                        selectedChatHistoryItem = it.selectedChatHistoryItem.copy(
+                            chatList = selectedChatList + lastChatMessage
+                        ),
+                    )
+                }
+            }
+
+            suspend fun handleServerEvents(serverEvents: Flow<ServerEvent>)  {
+                serverEvents.stateIn(
+                    viewModelScope,
+                    SharingStarted.WhileSubscribed(5000L),
+                    ServerEvent.BotStartedTyping
+                ).collect { serverEvent ->
+                    when (serverEvent) {
+                        is ServerEvent.BotStartedTyping -> appendEmptyBotMessageToCurrentMessageList()
+
+                        is ServerEvent.BotResponse -> addChunkToCurrentMessageList(serverEvent)
+
+                        is ServerEvent.BotFinishedTyping -> {
+                            _uiState.update {
+                                it.copy(
+                                    isBotTyping = false,
+                                    botStatusText = "Bot is online",
+                                )
+                            }
+                            playSound(AppSounds.MessageReceived)
+                            saveChat(_uiState.value.selectedChatHistoryItem)
+                        }
+                    }
+                }
+            }
+
+            suspend fun handleServerResponse(response: Resource<Flow<ServerEvent>>) {
                 when (response) {
                     is Resource.Success -> {
-                        val responseContent = response.data!!.choices[0].message.content
-                        _uiState.update {
-                            it.copy(
-                                selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
-                                    ChatMessage(
-                                        content = responseContent,
-                                        role = MessageRole.Bot
-                                    )
-                                ),
-                                botStatusText = "Bot is typing",
-                                isBotThinking = false,
-                                isBotTyping = true,
-                                wasTypingAnimationPlayed = false
-                            )
-                        }
-
-                        Logger.d("selectedChatHistoryItem id: ${_uiState.value.selectedChatHistoryItem.id}")
-                        saveChat(_uiState.value.selectedChatHistoryItem)
-                        playSound(AppSounds.MessageReceived)
+                        handleServerEvents(response.data!!)
                     }
 
                     is Resource.Error -> {
@@ -184,8 +235,7 @@ class MainScreenViewModel @Inject constructor(
                                     )
                                 ),
                                 botStatusText = "Bot had a problem, try again",
-                                isBotThinking = false,
-                                isBotTyping = true,
+                                isBotTyping = false,
                                 wasTypingAnimationPlayed = false
                             )
                         }
@@ -193,11 +243,13 @@ class MainScreenViewModel @Inject constructor(
                 }
             }
 
+
+
             //Main logic
             handleUserMessage()
             val prompts = _uiState.value.selectedChatHistoryItem.chatList.map { it.toApiMessage() }
             val response = getChatResponse(prompts)
-            handleBotResponse(response)
+            handleServerResponse(response)
         }
     }
 
@@ -208,16 +260,6 @@ class MainScreenViewModel @Inject constructor(
             it.copy(
                 prompt = prompt,
                 isPromptValid = promptValidationResult.success
-            )
-        }
-    }
-
-    fun onBotTypingFinished() {
-        _uiState.update {
-            it.copy(
-                isBotTyping = false,
-                botStatusText = "Bot is online",
-                wasTypingAnimationPlayed = true
             )
         }
     }
@@ -237,7 +279,7 @@ class MainScreenViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 saveChat(
                     ChatHistoryItemModel(
-                        chatList = listOf()
+                        chatList = mutableListOf()
                     )
                 )
 
@@ -278,7 +320,7 @@ class MainScreenViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             selectedChatHistoryItem = ChatHistoryItemModel(
-                                chatList = listOf()
+                                chatList = mutableListOf()
                             ),
                             selectedChatIndex = -1,
                             chatHistory = it.value.map { it.toDomainModel() }.toMutableList()

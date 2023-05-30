@@ -1,13 +1,13 @@
 package com.markusw.chatgptapp.data.network
 
-import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Streaming
 
 interface ChatGptApi {
-
     @POST("v1/chat/completions")
-    fun getPromptResponse(@Body body: RequestBody): Call<PromptResponse>
-
+    @Streaming
+    fun getPromptResponse(@Body body: RequestBody): Call<ResponseBody>
 }

@@ -1,5 +1,6 @@
 package com.markusw.chatgptapp.di
 
+import com.google.gson.GsonBuilder
 import com.markusw.chatgptapp.core.common.Constants.BASE_URL
 import com.markusw.chatgptapp.data.network.ChatGptApi
 import com.markusw.chatgptapp.data.network.interceptors.ChatGptApiInterceptor
@@ -19,11 +20,18 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(httpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .client(httpClient)
-        .build()
+    fun provideRetrofit(httpClient: OkHttpClient): Retrofit {
+
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(httpClient)
+            .build()
+    }
 
     @Provides
     @Singleton

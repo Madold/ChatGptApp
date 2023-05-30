@@ -9,12 +9,6 @@ data class ChatMessage(
     val role: MessageRole
 )
 
-/*@Serializable
-enum class MessageRole {
-    Bot,
-    User
-}*/
-
 @Serializable
 sealed interface MessageRole {
     @Serializable

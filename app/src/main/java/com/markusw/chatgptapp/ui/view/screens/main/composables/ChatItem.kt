@@ -12,17 +12,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.ui.TestTags
+import com.markusw.chatgptapp.ui.theme.spacing
 
 @Composable
 fun ChatItem(
     chat: ChatMessage,
-    isLastMessage: Boolean = false,
-    onBotTypingFinished: () -> Unit = {},
-    wasTypingAnimationPlayed: Boolean = false,
     onPromptCopied: () -> Unit = {}
 ) {
 
@@ -36,15 +33,12 @@ fun ChatItem(
                 color = if (isMessageFromBot) MaterialTheme.colorScheme.secondary
                 else MaterialTheme.colorScheme.background,
             )
-            .padding(16.dp)
+            .padding(MaterialTheme.spacing.medium)
             .testTag(TestTags.CHAT_ITEM)
     ) {
         ChatBubble(
             chat = chat,
-            isLastMessage = isLastMessage,
             isFromBot = isMessageFromBot,
-            onBotTypingFinished = onBotTypingFinished,
-            wasTypingAnimationPlayed = wasTypingAnimationPlayed,
             onPromptCopied = onPromptCopied
         )
     }

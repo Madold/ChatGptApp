@@ -20,10 +20,13 @@ fun ChatHistoryItemEntity.toDomainModel() = ChatHistoryItemModel(
 )
 
 
-fun ChatHistoryItemModel.addChatMessage(chatMessage: ChatMessage) = ChatHistoryItemModel(
-    id = id,
-    chatList = chatList + chatMessage,
-)
+
+fun ChatHistoryItemModel.addChatMessage(chatMessage: ChatMessage): ChatHistoryItemModel {
+    return ChatHistoryItemModel(
+        id = id,
+        chatList = chatList + chatMessage,
+    )
+}
 
 
 

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.markusw.chatgptapp.ui.view.screens.main
 
 import androidx.compose.foundation.layout.Box
@@ -10,7 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -23,16 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
+import com.markusw.chatgptapp.ui.theme.spacing
 import com.markusw.chatgptapp.ui.view.screens.main.composables.BotPresentationSlide
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
 import com.markusw.chatgptapp.ui.view.screens.main.composables.NavigationDrawerContent
 import com.markusw.chatgptapp.ui.view.screens.main.composables.PromptField
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -41,7 +38,6 @@ fun MainScreen(
     state: MainScreenState,
     onSendButtonClick: () -> Unit = {},
     onPromptChanged: (String) -> Unit = {},
-    onBotTypingFinished: () -> Unit = {},
     onThemeChanged: () -> Unit = {},
     onNewChat: () -> Unit = {},
     onChatSelected: (Int, ChatHistoryItemModel) -> Unit = { _, _ -> },
@@ -64,16 +60,15 @@ fun MainScreen(
 
     //Constant scroll to the last item while bot is typing
     LaunchedEffect(key1 = state.isBotTyping) {
-        launch(NonCancellable) {
-            while (state.isBotTyping) {
-                delay(50)
-                scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
-            }
+        while (state.isBotTyping) {
+            delay(25)
+            scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
         }
     }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = !state.isBotTyping,
         drawerContent = {
             ModalDrawerSheet(
                 content = {
@@ -101,7 +96,7 @@ fun MainScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp),
+                            .padding(bottom = MaterialTheme.spacing.small),
                         contentAlignment = Alignment.Center
 
                     ) {
@@ -110,7 +105,7 @@ fun MainScreen(
                             onPromptChanged = onPromptChanged,
                             onSendButtonClick = onSendButtonClick,
                             modifier = Modifier.fillMaxWidth(0.92f),
-                            isSendButtonEnabled = state.isPromptValid && !state.isBotTyping && !state.isBotThinking,
+                            isSendButtonEnabled = state.isPromptValid && !state.isBotTyping,
                             isSpeaking = state.isUserSpeaking,
                             onVoiceButtonClick = onVoiceButtonClick
                         )
@@ -120,8 +115,7 @@ fun MainScreen(
                     MainScreenTopBar(
                         botStatusText = state.botStatusText,
                         isBotTyping = state.isBotTyping,
-                        isBotThinking = state.isBotThinking,
-                        isNavigationIconButtonEnabled = !state.isBotTyping && !state.isBotThinking,
+                        isNavigationIconButtonEnabled = !state.isBotTyping,
                         onNavigationIconClick = {
                             coroutineScope.launch {
                                 drawerState.open()
@@ -145,9 +139,6 @@ fun MainScreen(
                                 itemsIndexed(state.selectedChatHistoryItem.chatList) { index, chat ->
                                     ChatItem(
                                         chat = chat,
-                                        isLastMessage = index == state.selectedChatHistoryItem.chatList.size - 1,
-                                        onBotTypingFinished = onBotTypingFinished,
-                                        wasTypingAnimationPlayed = state.wasTypingAnimationPlayed,
                                         onPromptCopied = onPromptCopied
                                     )
                                 }
