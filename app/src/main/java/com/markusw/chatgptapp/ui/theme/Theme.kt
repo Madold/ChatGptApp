@@ -32,6 +32,7 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun ChatGptAppTheme(
+    windowSizeClass: WindowSizeClass,
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
@@ -45,6 +46,11 @@ fun ChatGptAppTheme(
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    val orientation = when {
+        windowSizeClass.width.size > windowSizeClass.height.size -> Orientation.Landscape
+        else -> Orientation.Portrait
     }
 
     CompositionLocalProvider(
