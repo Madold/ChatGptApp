@@ -1,24 +1,19 @@
 package com.markusw.chatgptapp.data.repositories
 
-import com.markusw.chatgptapp.core.utils.Resource
 import com.markusw.chatgptapp.data.database.daos.ChatHistoryDao
 import com.markusw.chatgptapp.data.database.entities.ChatHistoryItemEntity
 import com.markusw.chatgptapp.data.network.remote.responses.Message
-import com.markusw.chatgptapp.data.network.remote.responses.PromptResponse
 import com.markusw.chatgptapp.data.network.services.ChatGptService
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 
-class AndroidChatRepository @Inject constructor(
+class AndroidChatRepository constructor(
     private val chatGptService: ChatGptService,
     private val chatHistoryDao: ChatHistoryDao
 ): ChatRepository {
 
-    override suspend fun getPromptResponse(prompts: List<Message>): Resource<PromptResponse> {
-        return chatGptService.getPromptResponse(prompts)
-    }
+    override suspend fun getPromptResponse(
+        prompts: List<Message>
+    ) = chatGptService.getPromptResponse(prompts)
 
     override fun getChatHistory(): Flow<MutableList<ChatHistoryItemEntity>> {
         return chatHistoryDao.getChatHistory()

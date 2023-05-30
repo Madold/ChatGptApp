@@ -1,18 +1,20 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.markusw.chatgptapp.ui.view.screens.main.composables
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.markusw.chatgptapp.R
+import com.markusw.chatgptapp.ui.theme.spacing
 
 @Composable
 fun PromptField(
@@ -29,12 +31,12 @@ fun PromptField(
     val sendIconTint by animateColorAsState(
         targetValue = if (isSendButtonEnabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
             alpha = 0.4f
-        ), label = ""
+        )
     )
 
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
@@ -56,10 +58,11 @@ fun PromptField(
             placeholder = {
                 BasicText(text = if(isSpeaking) "Listening..." else "Send a message...")
             },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 cursorColor = MaterialTheme.colorScheme.onBackground,
-                containerColor = MaterialTheme.colorScheme.background
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background
             ),
             enabled = isEnabled,
             maxLines = 7

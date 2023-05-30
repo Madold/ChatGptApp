@@ -4,9 +4,8 @@ import com.markusw.chatgptapp.data.database.daos.UserSettingsDao
 import com.markusw.chatgptapp.data.model.UserSettings
 import com.markusw.chatgptapp.data.model.toEntityModel
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class AndroidSettingsRepository @Inject constructor(
+class AndroidSettingsRepository(
     private val settingsDao: UserSettingsDao
 ) : SettingsRepository {
 

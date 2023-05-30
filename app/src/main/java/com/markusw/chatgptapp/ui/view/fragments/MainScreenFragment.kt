@@ -92,7 +92,6 @@ class MainScreenFragment : Fragment() {
                             state = state,
                             onSendButtonClick = viewModel::onPromptSend,
                             onPromptChanged = viewModel::onPromptChanged,
-                            onBotTypingFinished = viewModel::onBotTypingFinished,
                             onThemeChanged = viewModel::onThemeChanged,
                             onNewChat = viewModel::onNewChat,
                             onChatSelected = viewModel::onChatSelected,

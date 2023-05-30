@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,13 +16,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.markusw.chatgptapp.ui.theme.spacing
 
 @Composable
 fun MainScreenTopBar(
     botStatusText: String,
     isBotTyping: Boolean = false,
-    isBotThinking: Boolean = false,
     onNavigationIconClick: () -> Unit = {},
     isNavigationIconButtonEnabled: Boolean = true,
 ) {
@@ -36,9 +34,9 @@ fun MainScreenTopBar(
                     text = "ChatGPT Mobile App",
                     style = MaterialTheme.typography.labelSmall,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(MaterialTheme.spacing.extraSmall))
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     BasicText(
@@ -54,23 +52,9 @@ fun MainScreenTopBar(
                         ) + fadeOut()
                     ) {
                         ThreeDotsAnimation(
-                            dotSize = 8.dp,
-                            spaceBetweenDots = 4.dp,
-                            travelDistance = 4.dp,
-                        )
-                    }
-                    AnimatedVisibility(
-                        visible = isBotThinking,
-                        enter = slideInHorizontally() + expandHorizontally() + fadeIn(
-                            animationSpec = tween(delayMillis = 400)
-                        ),
-                        exit = slideOutHorizontally() + shrinkHorizontally(
-                            animationSpec = tween(delayMillis = 400)
-                        ) + fadeOut()
-                    ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.size(24.dp)
+                            dotSize = MaterialTheme.spacing.small,
+                            spaceBetweenDots = MaterialTheme.spacing.extraSmall,
+                            travelDistance = MaterialTheme.spacing.extraSmall,
                         )
                     }
                 }
