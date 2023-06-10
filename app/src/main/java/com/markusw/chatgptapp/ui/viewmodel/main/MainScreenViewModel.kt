@@ -40,6 +40,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/*
+* ViewModel for the main screen
+*
+* @property getChatResponse: Use case for retrieving the chat response from the server
+* @property Use case for playing a sound
+* @property Use case for validating the prompt from the user
+* @property Use case for retrieving the user settings from the local database
+* @property Use case for saving the user settings to the local database
+* @property Use case for retrieving the chat history from the local database
+* @property Use case for saving the chat history to the local database
+* @property Use case for deleting all chats from the local database
+* @property Use case for starting the voice recognition service
+* @property Use case for stopping the voice recognition service
+* @property Service for voice recognition
+* @property Use case for fetching the API key from the remote server
+* */
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     private val getChatResponse: GetChatResponse,
@@ -56,11 +72,23 @@ class MainScreenViewModel @Inject constructor(
     private val fetchApiKey: FetchApiKey
 ) : ViewModel() {
 
+    /*
+    * Mutable state flow for the UI state
+    * */
     private var _uiState = MutableStateFlow(MainScreenState())
+    /*
+    * Exposed state flow for the UI state
+    * */
     val uiState = _uiState.asStateFlow()
+    /*
+    * Queue for the permission dialog
+    * */
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
 
+    /*
+    * initial method for retrieving the user settings, chat history and fetching the API key
+    * */
     init {
         //Retrieves the locally saved user settings
         viewModelScope.launch(Dispatchers.IO) {
@@ -110,6 +138,9 @@ class MainScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) { fetchApiKey() }
     }
 
+    /*
+    * Method for handling the user prompt
+    * */
     fun onPromptSend() {
         viewModelScope.launch(Dispatchers.IO) {
             val prompt = _uiState.value.prompt.trim()
@@ -274,6 +305,10 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
+    /*
+    * Method to update and validate the prompt state
+    * @param prompt
+    * */
     fun onPromptChanged(prompt: String) {
         val promptValidationResult = validatePrompt(prompt)
         _uiState.update {
@@ -284,6 +319,9 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    /*
+    * Method to handle the theme change
+    * */
     fun onThemeChanged() {
         viewModelScope.launch(Dispatchers.IO) {
             val currentSettings = _uiState.value.userSettings
@@ -294,6 +332,9 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    /*
+    * Method to handle when user creates a new chat
+    * */
     fun onNewChat() {
         if (_uiState.value.chatHistory.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -316,6 +357,12 @@ class MainScreenViewModel @Inject constructor(
             }
         }
     }
+
+    /*
+    * Method to handle when user selects a chat from the chat history
+    * @param index
+    * @param chatHistoryItem
+    * */
     fun onChatSelected(index: Int, chatHistoryItem: ChatHistoryItemModel) {
         _uiState.update {
             it.copy(
@@ -325,10 +372,16 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    /*
+    * Plays a sound when user copies a prompt from bot
+    * */
     fun onPromptCopied() {
         playSound(AppSounds.PromptCopied)
     }
 
+    /*
+    * Deletes all chats from the chat history
+    * */
     fun onDeleteAllChats() {
         viewModelScope.launch(Dispatchers.IO) {
             deleteAllChats()
@@ -349,6 +402,11 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    /*
+    * Handles when user clicks on the voice button
+    *
+    * when user is not speaking, it starts listening else it stops listening
+    * */
     fun onVoiceButtonClick() {
         if (!_uiState.value.isUserSpeaking) {
             startListening()
@@ -358,10 +416,18 @@ class MainScreenViewModel @Inject constructor(
         stopListening()
     }
 
+    /*
+    * Dismiss the current dialog from the permission dialog queue
+    * */
     fun dismissDialog() {
         visiblePermissionDialogQueue.removeFirst()
     }
 
+    /*
+    * Handles the permission result
+    * @param permission
+    * @param isGranted
+    * */
     fun onPermissionResult(permission: String, isGranted: Boolean) {
         if (!isGranted) {
             visiblePermissionDialogQueue.add(element = permission)
