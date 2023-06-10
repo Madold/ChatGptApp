@@ -256,7 +256,8 @@ class MainScreenViewModel @Inject constructor(
                                 ),
                                 botStatusText = "Bot had a problem, try again",
                                 isBotTyping = false,
-                                wasTypingAnimationPlayed = false
+                                wasTypingAnimationPlayed = false,
+                                isCaretVisible = false
                             )
                         }
                     }
@@ -315,7 +316,6 @@ class MainScreenViewModel @Inject constructor(
             }
         }
     }
-
     fun onChatSelected(index: Int, chatHistoryItem: ChatHistoryItemModel) {
         _uiState.update {
             it.copy(
