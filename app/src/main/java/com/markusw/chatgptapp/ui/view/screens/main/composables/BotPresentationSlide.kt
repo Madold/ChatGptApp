@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.spacing
+import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 
 @Composable
 fun BotPresentationSlide(
@@ -68,7 +69,9 @@ fun BotPresentationSlidePreview() {
                 }
             },
             topBar = {
-                MainScreenTopBar(botStatusText = "Bot is online")
+                MainScreenTopBar(
+                    state = MainScreenState(),
+                )
             },
             content = { padding ->
                 BotPresentationSlide(

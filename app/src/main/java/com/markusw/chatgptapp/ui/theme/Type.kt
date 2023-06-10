@@ -4,78 +4,75 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.markusw.chatgptapp.R
 
-
-val Poppins = FontFamily(
-    Font(R.font.poppins_black,FontWeight.Black),
-    Font(R.font.poppins_bold, FontWeight.Bold),
-    Font(R.font.poppins_italic, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.poppins_light, FontWeight.Light),
-    Font(R.font.poppins_medium, FontWeight.Medium),
-    Font(R.font.poppins_regular, FontWeight.Normal),
-    Font(R.font.poppins_thin, FontWeight.Thin),
+val Inter = FontFamily(
+    Font(R.font.inter_black, FontWeight.Black),
+    Font(R.font.inter_bold, FontWeight.Bold),
+    Font(R.font.inter_light, FontWeight.Light),
+    Font(R.font.inter_medium, FontWeight.Medium),
+    Font(R.font.inter_regular, FontWeight.Normal),
+    Font(R.font.inter_thin, FontWeight.Thin),
 )
 
 val Typography = Typography(
     titleLarge = TextStyle(
-        fontFamily = Poppins,
+        fontFamily = Inter,
         fontWeight = FontWeight.Light,
-        fontSize = 79.sp,
+        fontSize = 94.sp,
         letterSpacing = (-1.5).sp,
     ),
 
     titleMedium = TextStyle(
-        fontFamily = Poppins,
+        fontFamily = Inter,
         fontWeight = FontWeight.Light,
-        fontSize = 49.sp,
+        fontSize = 59.sp,
         letterSpacing = (-0.5).sp,
     ),
 
     titleSmall = TextStyle(
-        fontFamily = Poppins,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
-        fontSize = 39.sp,
+        fontSize = 47.sp,
         letterSpacing = 0.sp,
     ),
 
     labelLarge = TextStyle(
-        fontFamily = Poppins,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
-        fontSize = 34.sp,
-        letterSpacing = 0.sp,
-    ),
-
-    labelMedium = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 28.sp,
+        fontSize = 33.sp,
         letterSpacing = 0.25.sp,
     ),
 
-    labelSmall = TextStyle(
-        fontFamily = Poppins,
+    labelMedium = TextStyle(
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
-        fontSize = 20.sp,
+        fontSize = 24.sp,
         letterSpacing = 0.sp,
     ),
 
+    labelSmall = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        letterSpacing = 0.15.sp,
+    ),
+
     bodyLarge = TextStyle(
-        fontFamily = Poppins,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         letterSpacing = 0.5.sp,
     ),
 
     bodyMedium = TextStyle(
-        fontFamily = Poppins,
+        fontFamily = Inter,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         letterSpacing = 0.25.sp,
     ),
 
 
-)
+    )

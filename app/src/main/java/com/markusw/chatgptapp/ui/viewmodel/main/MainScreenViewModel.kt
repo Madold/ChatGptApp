@@ -16,6 +16,7 @@ import com.markusw.chatgptapp.data.model.toDomainModel
 import com.markusw.chatgptapp.domain.ServerEvent
 import com.markusw.chatgptapp.domain.services.VoiceRecognitionService
 import com.markusw.chatgptapp.domain.use_cases.DeleteAllChats
+import com.markusw.chatgptapp.domain.use_cases.FetchApiKey
 import com.markusw.chatgptapp.domain.use_cases.GetChatHistory
 import com.markusw.chatgptapp.domain.use_cases.GetChatResponse
 import com.markusw.chatgptapp.domain.use_cases.GetUserSettings
@@ -26,6 +27,7 @@ import com.markusw.chatgptapp.domain.use_cases.StartListening
 import com.markusw.chatgptapp.domain.use_cases.StopListening
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
+import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +52,8 @@ class MainScreenViewModel @Inject constructor(
     private val deleteAllChats: DeleteAllChats,
     private val startListening: StartListening,
     private val stopListening: StopListening,
-    private val voiceRecognitionService: VoiceRecognitionService
+    private val voiceRecognitionService: VoiceRecognitionService,
+    private val fetchApiKey: FetchApiKey
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(MainScreenState())
@@ -64,7 +67,7 @@ class MainScreenViewModel @Inject constructor(
             getUserSettings()
                 .stateIn(
                     viewModelScope,
-                    SharingStarted.WhileSubscribed(5000L),
+                    SharingStarted.WhileSubscribed(),
                     UserSettings()
                 ).collectLatest { settings ->
                     _uiState.update {
@@ -80,7 +83,7 @@ class MainScreenViewModel @Inject constructor(
             getChatHistory()
                 .stateIn(
                     viewModelScope,
-                    SharingStarted.WhileSubscribed(5000L),
+                    SharingStarted.WhileSubscribed(),
                     listOf()
                 )
                 .collectLatest { history ->
@@ -102,6 +105,9 @@ class MainScreenViewModel @Inject constructor(
                 }
             }
         }
+
+        // Fetches the API key from the server
+        viewModelScope.launch(Dispatchers.IO) { fetchApiKey() }
     }
 
     fun onPromptSend() {
@@ -155,25 +161,24 @@ class MainScreenViewModel @Inject constructor(
                         isPromptValid = false,
                     )
                 }
-            }
 
-            fun appendEmptyBotMessageToCurrentMessageList() {
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    state.copy(
                         selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
                             ChatMessage(
                                 content = "",
                                 role = MessageRole.Bot
                             )
-                        ),
-                        botStatusText = "Bot is typing",
-                        isBotTyping = true,
-                        wasTypingAnimationPlayed = false
+                        )
                     )
                 }
+
             }
 
             fun addChunkToCurrentMessageList(chunk: ServerEvent.BotResponse) {
+
+                Logger.d("Received chunk: ${chunk.response.choices[0].delta.content}")
+
                 var selectedChatList =
                     _uiState.value.selectedChatHistoryItem.chatList
                 var lastChatMessage =
@@ -194,14 +199,22 @@ class MainScreenViewModel @Inject constructor(
                 }
             }
 
-            suspend fun handleServerEvents(serverEvents: Flow<ServerEvent>)  {
+            suspend fun handleServerEvents(serverEvents: Flow<ServerEvent>) {
                 serverEvents.stateIn(
                     viewModelScope,
-                    SharingStarted.WhileSubscribed(5000L),
+                    SharingStarted.WhileSubscribed(),
                     ServerEvent.BotStartedTyping
                 ).collect { serverEvent ->
                     when (serverEvent) {
-                        is ServerEvent.BotStartedTyping -> appendEmptyBotMessageToCurrentMessageList()
+                        is ServerEvent.BotStartedTyping -> {
+                            _uiState.update {
+                                it.copy(
+                                    botStatusText = "Bot is typing",
+                                    isBotTyping = true,
+                                    wasTypingAnimationPlayed = false
+                                )
+                            }
+                        }
 
                         is ServerEvent.BotResponse -> addChunkToCurrentMessageList(serverEvent)
 
@@ -226,13 +239,21 @@ class MainScreenViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
+
+                        var selectedChatList =
+                            _uiState.value.selectedChatHistoryItem.chatList
+                        var lastChatMessage =
+                            _uiState.value.selectedChatHistoryItem.chatList.last()
+                        lastChatMessage = lastChatMessage.copy(
+                            content = response.message!!
+                        )
+
+                        selectedChatList = selectedChatList.dropLast(1)
+
                         _uiState.update {
                             it.copy(
-                                selectedChatHistoryItem = _uiState.value.selectedChatHistoryItem.addChatMessage(
-                                    ChatMessage(
-                                        content = response.message!!,
-                                        role = MessageRole.Bot
-                                    )
+                                selectedChatHistoryItem = it.selectedChatHistoryItem.copy(
+                                    chatList = selectedChatList + lastChatMessage
                                 ),
                                 botStatusText = "Bot had a problem, try again",
                                 isBotTyping = false,
@@ -242,7 +263,6 @@ class MainScreenViewModel @Inject constructor(
                     }
                 }
             }
-
 
 
             //Main logic

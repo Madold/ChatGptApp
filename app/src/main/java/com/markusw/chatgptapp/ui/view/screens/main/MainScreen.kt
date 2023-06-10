@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.markusw.chatgptapp.data.model.ChatHistoryItemModel
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.DarkBlue
+import com.markusw.chatgptapp.ui.theme.rememberWindowSizeClass
 import com.markusw.chatgptapp.ui.theme.spacing
 import com.markusw.chatgptapp.ui.view.screens.main.composables.BotPresentationSlide
 import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
@@ -74,8 +75,20 @@ fun MainScreen(
                 content = {
                     NavigationDrawerContent(
                         state = state,
-                        onThemeChanged = onThemeChanged,
-                        onNewChat = onNewChat,
+                        onThemeChanged = {
+                            onThemeChanged()
+                            coroutineScope.launch {
+                                delay(200)
+                                drawerState.close()
+                            }
+                        },
+                        onNewChat = {
+                            onNewChat()
+                            coroutineScope.launch {
+                                delay(200)
+                                drawerState.close()
+                            }
+                        },
                         onChatSelected = { index, chat ->
                             onChatSelected(index, chat)
                             coroutineScope.launch {
@@ -83,7 +96,13 @@ fun MainScreen(
                                 drawerState.close()
                             }
                         },
-                        onDeleteAllChats = onDeleteAllChats
+                        onDeleteAllChats = {
+                            onDeleteAllChats()
+                            coroutineScope.launch {
+                                delay(200)
+                                drawerState.close()
+                            }
+                        }
                     )
                 },
                 drawerShape = RectangleShape,
@@ -113,9 +132,7 @@ fun MainScreen(
                 },
                 topBar = {
                     MainScreenTopBar(
-                        botStatusText = state.botStatusText,
-                        isBotTyping = state.isBotTyping,
-                        isNavigationIconButtonEnabled = !state.isBotTyping,
+                        state = state,
                         onNavigationIconClick = {
                             coroutineScope.launch {
                                 drawerState.open()
@@ -160,6 +177,7 @@ fun MainScreenPreview() {
     ChatGptAppTheme(
         dynamicColor = false,
         darkTheme = true,
+        windowSizeClass = rememberWindowSizeClass()
     ) {
         MainScreen(
             state = MainScreenState(

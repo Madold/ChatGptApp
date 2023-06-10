@@ -30,7 +30,7 @@ android {
 
     buildTypes {
         named("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -82,6 +82,8 @@ dependencies {
 
     // Firebase Analytics
     implementation("com.google.firebase:firebase-analytics-ktx")
+    // Firebase remote config
+    implementation("com.google.firebase:firebase-config-ktx")
 
     implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")

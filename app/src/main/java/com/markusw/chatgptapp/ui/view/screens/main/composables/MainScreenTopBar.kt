@@ -12,25 +12,24 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.markusw.chatgptapp.ui.theme.spacing
+import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 
 @Composable
 fun MainScreenTopBar(
-    botStatusText: String,
-    isBotTyping: Boolean = false,
+    state: MainScreenState,
     onNavigationIconClick: () -> Unit = {},
-    isNavigationIconButtonEnabled: Boolean = true,
 ) {
     CenterAlignedTopAppBar(
         title = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BasicText(
+            ) { Text(
                     text = "ChatGPT Mobile App",
                     style = MaterialTheme.typography.labelSmall,
                 )
@@ -39,14 +38,13 @@ fun MainScreenTopBar(
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    BasicText(
-                        text = botStatusText,
+                    Text(
+                        text = state.botStatusText,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                     AnimatedVisibility(
-                        visible = isBotTyping,
-                        enter = slideInHorizontally() + expandHorizontally() + fadeIn(
-                            animationSpec = tween(delayMillis = 400)
-                        ),
+                        visible = state.isBotTyping,
+                        enter = slideInHorizontally() + expandHorizontally() + fadeIn(),
                         exit = slideOutHorizontally() + shrinkHorizontally(
                             animationSpec = tween(delayMillis = 400)
                         ) + fadeOut()
@@ -61,7 +59,7 @@ fun MainScreenTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = onNavigationIconClick, enabled = isNavigationIconButtonEnabled) {
+            IconButton(onClick = onNavigationIconClick, enabled = !state.isBotTyping) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = null

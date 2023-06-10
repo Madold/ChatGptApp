@@ -18,13 +18,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.markusw.chatgptapp.core.utils.ext.openAppSettings
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
+import com.markusw.chatgptapp.ui.theme.rememberWindowSizeClass
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreen
 import com.markusw.chatgptapp.ui.view.screens.main.composables.PermissionDialog
 import com.markusw.chatgptapp.ui.view.screens.main.composables.RecordAudioPermissionProvider
@@ -32,7 +33,7 @@ import com.markusw.chatgptapp.ui.viewmodel.main.MainScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainScreenFragment : Fragment() {
+class MainScreenFragment: Fragment() {
 
     private lateinit var composeView: ComposeView
     private val viewModel: MainScreenViewModel by viewModels()
@@ -56,6 +57,7 @@ class MainScreenFragment : Fragment() {
             )
             setContent {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()
+                val windowSizeClass = rememberWindowSizeClass()
                 val dialogQueue = viewModel.visiblePermissionDialogQueue
                 val context = LocalContext.current
                 val focusManager = LocalFocusManager.current
@@ -71,7 +73,8 @@ class MainScreenFragment : Fragment() {
 
                 ChatGptAppTheme(
                     dynamicColor = false,
-                    darkTheme = state.userSettings.darkModeEnabled
+                    darkTheme = state.userSettings.darkModeEnabled,
+                    windowSizeClass = windowSizeClass
                 ) {
 
                     val systemUiController = rememberSystemUiController()
@@ -86,7 +89,8 @@ class MainScreenFragment : Fragment() {
 
                     Surface(
                         modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
                         MainScreen(
                             state = state,
@@ -98,8 +102,7 @@ class MainScreenFragment : Fragment() {
                             onPromptCopied = viewModel::onPromptCopied,
                             onDeleteAllChats = viewModel::onDeleteAllChats,
                             onVoiceButtonClick = {
-
-                                if (ContextCompat.checkSelfPermission(
+                                if (checkSelfPermission(
                                         context,
                                         Manifest.permission.RECORD_AUDIO
                                     ) != PackageManager.PERMISSION_GRANTED

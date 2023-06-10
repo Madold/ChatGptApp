@@ -19,7 +19,12 @@ private val LightColorScheme = lightColorScheme(
     secondary = White80,
     tertiary = DarkBlue,
     background = White,
-    onBackground = DarkBlue50
+    surface = White,
+    onBackground = DarkBlue50,
+    onSurface = DarkBlue50,
+    surfaceTint = White,
+    onSurfaceVariant = DarkBlue50,
+    onPrimary = DarkBlue50
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -27,12 +32,18 @@ private val DarkColorScheme = darkColorScheme(
     secondary = DarkBlue70,
     tertiary = DarkBlue,
     background = DarkBlue50,
-    onBackground = White
+    surface = DarkBlue50,
+    onBackground = White,
+    onSurface = White,
+    surfaceTint = DarkBlue50,
+    onSurfaceVariant = White,
+    onPrimary = White,
+    onTertiary = White
 )
 
 @Composable
 fun ChatGptAppTheme(
-    windowSizeClass: WindowSizeClass,
+    windowSizeClass: WindowSizeClass = rememberWindowSizeClass(),
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

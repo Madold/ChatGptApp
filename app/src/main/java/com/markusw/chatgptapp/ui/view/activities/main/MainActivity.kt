@@ -1,7 +1,6 @@
 package com.markusw.chatgptapp.ui.view.activities.main
 
 import android.os.Bundle
-import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.markusw.chatgptapp.databinding.ActivityMainBinding
