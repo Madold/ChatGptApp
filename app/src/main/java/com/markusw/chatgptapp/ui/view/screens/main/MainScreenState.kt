@@ -14,4 +14,5 @@ data class MainScreenState(
     val userSettings: UserSettings = UserSettings(),
     val wasTypingAnimationPlayed: Boolean = true,
     val isUserSpeaking: Boolean = false,
+    val isCaretVisible: Boolean = false,
 )

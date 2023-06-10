@@ -1,8 +1,12 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.markusw.chatgptapp.ui.view.screens.main.composables
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -16,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -30,11 +35,14 @@ import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.ui.TestTags.COPY_BOT_MESSAGE_BUTTON
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.spacing
+import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 
 @Composable
 fun ChatBubble(
     chat: ChatMessage,
+    isLast: Boolean,
     isFromBot: Boolean = false,
+    isCaretVisible: Boolean = false,
     onPromptCopied: () -> Unit = {}
 ) {
 
@@ -54,10 +62,17 @@ fun ChatBubble(
             }
             CompositionLocalProvider(LocalTextSelectionColors provides selectionColors) {
                 SelectionContainer {
-                    Text(
-                        text = chat.content,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                    FlowRow(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = chat.content,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        if (isFromBot && isCaretVisible  && isLast) {
+                            BlinkingCaret()
+                        }
+                    }
                 }
             }
         }
@@ -100,7 +115,8 @@ fun ChatBubblePreview() {
         ) {
             ChatBubble(
                 chat = ChatMessage(content = "Hi, I'm an AI bot", role = MessageRole.Bot),
-                isFromBot = true
+                isFromBot = true,
+                isLast = false
             )
         }
     }

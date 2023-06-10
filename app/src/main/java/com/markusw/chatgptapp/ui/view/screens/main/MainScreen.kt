@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DrawerValue
@@ -31,6 +32,7 @@ import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
 import com.markusw.chatgptapp.ui.view.screens.main.composables.NavigationDrawerContent
 import com.markusw.chatgptapp.ui.view.screens.main.composables.PromptField
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -155,8 +157,10 @@ fun MainScreen(
                             ) {
                                 itemsIndexed(state.selectedChatHistoryItem.chatList) { index, chat ->
                                     ChatItem(
+                                        isCaretVisible = state.isCaretVisible,
                                         chat = chat,
-                                        onPromptCopied = onPromptCopied
+                                        onPromptCopied = onPromptCopied,
+                                        isLast = index == state.selectedChatHistoryItem.chatList.size - 1
                                     )
                                 }
                             }

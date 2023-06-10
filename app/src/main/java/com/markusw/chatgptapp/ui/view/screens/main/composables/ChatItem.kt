@@ -16,10 +16,13 @@ import com.markusw.chatgptapp.data.model.ChatMessage
 import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.ui.TestTags
 import com.markusw.chatgptapp.ui.theme.spacing
+import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
 
 @Composable
 fun ChatItem(
     chat: ChatMessage,
+    isLast: Boolean,
+    isCaretVisible: Boolean = false,
     onPromptCopied: () -> Unit = {}
 ) {
 
@@ -37,6 +40,8 @@ fun ChatItem(
             .testTag(TestTags.CHAT_ITEM)
     ) {
         ChatBubble(
+            isLast = isLast,
+            isCaretVisible = isCaretVisible,
             chat = chat,
             isFromBot = isMessageFromBot,
             onPromptCopied = onPromptCopied

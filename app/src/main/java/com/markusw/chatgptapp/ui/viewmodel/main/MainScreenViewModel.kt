@@ -169,16 +169,14 @@ class MainScreenViewModel @Inject constructor(
                                 content = "",
                                 role = MessageRole.Bot
                             )
-                        )
+                        ),
+                        isCaretVisible = true
                     )
                 }
 
             }
 
             fun addChunkToCurrentMessageList(chunk: ServerEvent.BotResponse) {
-
-                Logger.d("Received chunk: ${chunk.response.choices[0].delta.content}")
-
                 var selectedChatList =
                     _uiState.value.selectedChatHistoryItem.chatList
                 var lastChatMessage =
@@ -223,6 +221,7 @@ class MainScreenViewModel @Inject constructor(
                                 it.copy(
                                     isBotTyping = false,
                                     botStatusText = "Bot is online",
+                                    isCaretVisible = false,
                                 )
                             }
                             playSound(AppSounds.MessageReceived)
