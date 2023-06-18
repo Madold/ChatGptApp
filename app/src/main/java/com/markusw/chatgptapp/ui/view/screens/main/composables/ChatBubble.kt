@@ -35,7 +35,7 @@ import com.markusw.chatgptapp.data.model.MessageRole
 import com.markusw.chatgptapp.ui.TestTags.COPY_BOT_MESSAGE_BUTTON
 import com.markusw.chatgptapp.ui.theme.ChatGptAppTheme
 import com.markusw.chatgptapp.ui.theme.spacing
-import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun ChatBubble(
@@ -65,11 +65,21 @@ fun ChatBubble(
                     FlowRow(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = chat.content,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                        if (isFromBot && isCaretVisible  && isLast) {
+                        if (isFromBot) {
+                           MarkdownText(
+                               markdown = chat.content,
+                               style = MaterialTheme.typography.bodyLarge,
+                               color = MaterialTheme.colorScheme.onBackground,
+                               fontResource = R.font.inter_regular,
+                               disableLinkMovementMethod = true
+                           )
+                        } else {
+                            Text(
+                                text = chat.content,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                        if (isFromBot && isCaretVisible && isLast) {
                             BlinkingCaret()
                         }
                     }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DrawerValue
@@ -32,7 +31,6 @@ import com.markusw.chatgptapp.ui.view.screens.main.composables.ChatItem
 import com.markusw.chatgptapp.ui.view.screens.main.composables.MainScreenTopBar
 import com.markusw.chatgptapp.ui.view.screens.main.composables.NavigationDrawerContent
 import com.markusw.chatgptapp.ui.view.screens.main.composables.PromptField
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -53,18 +51,9 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-
     //Auto scroll to the last item when new message is added
     LaunchedEffect(key1 = state.selectedChatHistoryItem) {
         if (state.selectedChatHistoryItem.chatList.isNotEmpty()) {
-            scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
-        }
-    }
-
-    //Constant scroll to the last item while bot is typing
-    LaunchedEffect(key1 = state.isBotTyping) {
-        while (state.isBotTyping) {
-            delay(25)
             scrollState.animateScrollToItem(state.selectedChatHistoryItem.chatList.size)
         }
     }
@@ -192,6 +181,3 @@ fun MainScreenPreview() {
         )
     }
 }
-
-
-

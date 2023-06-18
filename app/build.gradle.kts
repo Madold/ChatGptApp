@@ -22,10 +22,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-
-        val properties = Properties()
-        properties.load(project.rootProject.file("local.properties").inputStream())
-        buildConfigField("String", "API_KEY", "\"${properties.getProperty("API_KEY")}\"")
     }
 
     buildTypes {
@@ -76,6 +72,8 @@ dependencies {
     val firebaseBomVersion = "32.0.0"
     val mockVersion = "1.13.5"
     val composeVersion = "1.4.3"
+    val composeRichTextVersion = "0.16.0"
+
 
     // Firebase BOM
     implementation(platform("com.google.firebase:firebase-bom:$firebaseBomVersion"))
@@ -131,6 +129,12 @@ dependencies {
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.compose.material3:material3:1.1.0")
+
+    // Alternative to compose rich text
+    implementation("com.github.jeziellago:compose-markdown:0.3.3")
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
 
     // Test implementations
     testImplementation("junit:junit:4.13.2")

@@ -38,5 +38,6 @@
       <option name="previewFile" value="true" />
     </inspection_tool>
     <inspection_tool class="PrivatePropertyName" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PropertyName" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
   </profile>
 </component>

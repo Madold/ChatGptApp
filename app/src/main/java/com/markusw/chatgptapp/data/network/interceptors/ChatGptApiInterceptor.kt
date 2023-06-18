@@ -10,8 +10,6 @@ class ChatGptApiInterceptor @Inject constructor() : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
-        Logger.d("intercepting request with api key: ${GlobalConfig.apiKey}")
-
         val request = chain.request().newBuilder()
             .addHeader("Content-Type", "application/json")
             .addHeader("Authorization", "Bearer ${GlobalConfig.apiKey}")

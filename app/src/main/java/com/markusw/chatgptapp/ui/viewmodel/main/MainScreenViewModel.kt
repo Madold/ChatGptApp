@@ -27,7 +27,6 @@ import com.markusw.chatgptapp.domain.use_cases.StartListening
 import com.markusw.chatgptapp.domain.use_cases.StopListening
 import com.markusw.chatgptapp.domain.use_cases.ValidatePrompt
 import com.markusw.chatgptapp.ui.view.screens.main.MainScreenState
-import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
