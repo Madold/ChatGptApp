@@ -30,6 +30,7 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 <div align="center">
   <img src="https://github.com/Madold/ChatGptApp/assets/83137365/5343469b-8333-4fd0-9c5c-8424f873e328" height="482" style="display:block;" >
 </div>
+
 - Voice recognition
 - Persistent chat history
 - Easily copy AI responses
