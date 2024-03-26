@@ -16,6 +16,7 @@ This is a simple **ChatGPT clone** developed for the Android platform for the pu
 - Coroutines
 - JSON
 - Dagger-Hilt
+- Local SQL Database (Room)
 
 ## Used architecture
 - MVVM
