@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "645374743820",
+    "project_id": "chatbotapp-8c9c3",
+    "storage_bucket": "chatbotapp-8c9c3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645374743820:android:de3802da729893f1a76529",
+        "android_client_info": {
+          "package_name": "com.markusw.chatgptapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEvlAuDVbc7-XwlqCrwYZkRwN64NC4OnM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

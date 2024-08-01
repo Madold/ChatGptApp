@@ -16,7 +16,7 @@ class ChatGptApp : Application() {
     }
 
     private fun setupFirebase() {
-        val remoteConfigSettings = remoteConfigSettings { minimumFetchIntervalInSeconds = 3600 }
+        val remoteConfigSettings = remoteConfigSettings { minimumFetchIntervalInSeconds = 10 }
         val firebaseConfig = FirebaseClient.remoteConfig
         firebaseConfig.setConfigSettingsAsync(remoteConfigSettings)
     }
